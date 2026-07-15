@@ -1,4 +1,4 @@
 interface:
   display_name: "Check Code Conventions"
-  short_description: "Compare local and package Unity conventions"
-  default_prompt: "Use $code-convention-check to compare project-local conventions with package defaults without changing files."
+  short_description: "Audit profile overlap, retirement, and skill drift"
+  default_prompt: "Use $code-convention-check to audit convention overlap, owner routes, retirement readiness, and skill drift without changing files."

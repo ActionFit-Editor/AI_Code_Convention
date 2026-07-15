@@ -18,17 +18,25 @@ MonoBehaviour:
   _repositoryVisibility: 1
   _owner: ActionFit
   _status: candidate
-  _description: Portable local-first Unity code-authoring guidance and Agent Skills
-    for convention comparison and authorized application.
-  _releaseNote: "- \uD504\uB85C\uC81D\uD2B8 \uB85C\uCEEC \uADDC\uCE59\uC744 \uC6B0\uC120\uD558\uB294
-    \uC548\uC815\uC801\uC778 AFCC \uADDC\uCE59 ID\uC640 Decision Log \uACC4\uC57D\uC744
-    \uC81C\uACF5\uD569\uB2C8\uB2E4.\n- Codex\uC640 Claude\uC5D0 code-convention-help,
-    code-convention-check, code-convention-apply \uC2A4\uD0AC\uC744 \uB4F1\uB85D\uD574
-    \uC124\uBA85, \uC77D\uAE30 \uC804\uC6A9 \uBE44\uAD50, \uC2B9\uC778\uB41C \uCF54\uB4DC
-    \uBCC0\uACBD \uC801\uC6A9\uC744 \uC9C0\uC6D0\uD569\uB2C8\uB2E4.\n- check \uC2A4\uD0AC\uC740
-    Aligned, Local Extension, Conflict \u2014 Local Wins, Package Default, Local
-    Only, Package/API Mismatch\uB85C \uBB38\uC11C \uAD00\uACC4\uB97C \uBD84\uB958\uD569\uB2C8\uB2E4.\n-
-    \uB7F0\uD0C0\uC784 \uD504\uB808\uC784\uC6CC\uD06C\uC640 ReferenceBinding \uAD6C\uD604\uC740
-    \uD3EC\uD568\uD558\uC9C0 \uC54A\uC73C\uBA70 \uAD8C\uB9AC \uAC80\uD1A0 \uC804\uAE4C\uC9C0
-    Private candidate\uB85C \uC720\uC9C0\uD569\uB2C8\uB2E4."
+  _description: Portable Unity code-authoring rules with explicit profiles, API-owner
+    routing, retirement checks, and authorized application.
+  _releaseNote: "- `portable-core` \uAE30\uBCF8 \uADDC\uCE59\uACFC \uBA85\uC2DC\uC801\uC73C\uB85C
+    \uC120\uD0DD\uD558\uB294 `actionfit-unity` \uD504\uB85C\uD544\uC744 \uBD84\uB9AC\uD574
+    \uB2E4\uB978 \uD504\uB85C\uC81D\uD2B8\uC5D0\uB294 ActionFit \uC120\uD0DD \uADDC\uCE59\uC774
+    \uC790\uB3D9 \uC801\uC6A9\uB418\uC9C0 \uC54A\uC2B5\uB2C8\uB2E4.\n- \uC798\uBABB\uB41C
+    ActionFit-Editor \uC124\uCE58 URL\uC744 \uC2E4\uC81C ActionFitGames/AI_Code_Convention
+    \uC800\uC7A5\uC18C\uC640 `0.2.0` \uD0DC\uADF8\uB85C \uAD50\uC815\uD588\uC2B5\uB2C8\uB2E4.\n-
+    \uC8FC\uC11D, \uB85C\uADF8, guard, UniTask, loop, Refs, DOTween, Editor asset
+    \uCC38\uC870, SO Singleton, \uC9C1\uB82C\uD654 migration \uADDC\uCE59\uC5D0 \uC548\uC815\uC801\uC778
+    `AFCC-*` ID\uC640 capability gate\uB97C \uCD94\uAC00\uD588\uC2B5\uB2C8\uB2E4.\n-
+    `code-convention-check`\uAC00 \uAE30\uC874 6\uAC1C \uBE44\uAD50 \uBD84\uB958\uB97C
+    \uC720\uC9C0\uD558\uBA74\uC11C \uB85C\uCEEC \uAD8C\uD55C, \uBBF8\uC774\uAD00
+    \uADDC\uCE59, owner route, stale link, \uC124\uCE58 \uC2A4\uD0AC drift\uB97C
+    \uC77D\uAE30 \uC804\uC6A9\uC73C\uB85C \uAC80\uC99D\uD569\uB2C8\uB2E4.\n- `code-convention-help`\uC640
+    `code-convention-apply`\uAC00 \uB85C\uCEEC convention \uBB38\uC11C \uC5C6\uC774\uB3C4
+    \uC120\uD0DD\uB41C \uD504\uB85C\uD544\uACFC \uC124\uCE58\uB41C API owner guide\uB97C
+    \uAE30\uC900\uC73C\uB85C \uB3D9\uC791\uD569\uB2C8\uB2E4.\n- Runtime \uAD6C\uD604,
+    \uD504\uB85C\uC81D\uD2B8 asset, \uC124\uC815, publish \uB3D9\uC791\uC740 \uBCC0\uACBD\uD558\uC9C0
+    \uC54A\uC73C\uBA70 \uD328\uD0A4\uC9C0\uB294 Private candidate \uC0C1\uD0DC\uB97C
+    \uC720\uC9C0\uD569\uB2C8\uB2E4."
   _dependenciesOverride: 

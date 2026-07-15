@@ -4,13 +4,20 @@ Use this reference only after reading the consuming repository's instructions an
 
 ## Contents
 
-1. [Architecture and state](#architecture-and-state)
-2. [Communication selection](#communication-selection)
-3. [Persistence and live economy](#persistence-and-live-economy)
-4. [Lifecycle, async, and static state](#lifecycle-async-and-static-state)
-5. [Assets, serialization, and assemblies](#assets-serialization-and-assemblies)
-6. [Anti-pattern review](#anti-pattern-review)
-7. [Validation matrix](#validation-matrix)
+1. [Rule selection](#rule-selection)
+2. [Architecture and state](#architecture-and-state)
+3. [Communication selection](#communication-selection)
+4. [Persistence and live economy](#persistence-and-live-economy)
+5. [Lifecycle, async, and static state](#lifecycle-async-and-static-state)
+6. [Assets, serialization, and assemblies](#assets-serialization-and-assemblies)
+7. [Anti-pattern review](#anti-pattern-review)
+8. [Validation matrix](#validation-matrix)
+
+## Rule Selection
+
+Apply portable core without requiring a selector. Read `references/profiles/actionfit-unity.md` only when the primary project router contains the exact selector required by `AFCC-PRO-001`. Read `references/owner-routing.md` before choosing a concrete package API. Missing capability evidence leaves an optional rule inactive; it never authorizes dependency installation or symbol changes.
+
+Project safety, workflow, and factual architecture still supply higher-scope constraints and concrete mappings. They do not need to duplicate the selected package's code-convention body.
 
 ## Architecture And State
 
@@ -171,9 +178,13 @@ Flag these patterns before adding more of them:
 - detached async work without cancellation or observed failure;
 - resource handle whose owner or release boundary is unknown;
 - Runtime assembly referencing Editor code;
+- fixed Editor project paths for movable asset or folder references when a serialized or GUID-backed route exists;
+- singleton ScriptableObject selected without proving single-instance configuration ownership or reading its installed owner;
 - serialized rename, GUID change, asset reset, or reserialization without an approved migration;
 - persistence schema change without fixtures and recovery;
 - public API change mixed with unrelated refactoring.
+- profile or optional-library behavior inferred without an exact selector and capability evidence;
+- a concrete package API selected without reading the installed owner guide;
 
 An existing occurrence is evidence, not automatic authority to fix it. Report it and split remediation into a separately authorized task unless the current scope explicitly owns it.
 
@@ -192,5 +203,7 @@ Run the smallest evidence that can prove the changed contract, then add risk-spe
 | Dynamic asset/load | key, failure, release ownership | memory/profile and cold remote load |
 | Static/event hub | re-entry and cleanup | domain reload disabled when supported |
 | Live/remote data | default, range, failure fallback | rollout, kill switch, rollback, server compatibility |
+| Profile or owner route | exact selector, capability and installed guide | negative fixture without the optional capability |
+| Convention retirement | shadow mapping, stale-link and skill-drift audit | package-only rerun after approved deletion |
 
 For every check, record the exact scope and distinguish package failures, project regressions, known issues, environment failures, and unverified manual behavior.

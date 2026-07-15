@@ -1,8 +1,8 @@
 {
   "name": "com.actionfit.ai-codeconvention",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "displayName": "AI Code Convention",
-  "description": "Portable local-first Unity code-authoring guidance and Agent Skills for convention comparison and authorized application.",
+  "description": "Portable Unity code-authoring rules with explicit profiles, API-owner routing, retirement checks, and authorized application.",
   "unity": "6000.2",
   "author": { "name": "ActionFit" },
   "dependencies": {

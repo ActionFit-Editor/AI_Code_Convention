@@ -6,15 +6,15 @@ This file is the portable authority for generic Unity code-authoring rules distr
 
 - Package ID: `com.actionfit.ai-codeconvention`
 - Display name: AI Code Convention
-- Repository: `https://github.com/ActionFit-Editor/AI_Code_Convention.git`
+- Repository: `https://github.com/ActionFitGames/AI_Code_Convention.git`
 - Repository visibility: Private
-- Current package version at generation time: `0.1.0`
+- Current package version at generation time: `0.2.0`
 - Unity version: `6000.2`
 - Custom Package Manager dependency: published `1.1.84`
 
 ## Purpose And Boundary
 
-Use this package to choose safe, reusable defaults when authoring or changing Unity code, compare those defaults with a consuming project's documented conventions, and apply only the effective local-first rules within an already authorized change.
+Use this package to choose safe, reusable defaults when authoring or changing Unity code, opt in to an organization profile through explicit routing metadata, resolve concrete APIs through their installed owners, compare documented contracts, and apply only the effective rules within an already authorized change.
 
 The package does not require a particular class or folder layout. Names such as `SceneController`, `GameplayRoot`, `GameSession`, and `FeatureRoot` describe conceptual responsibilities only. A consuming project may use different names, split the roles differently, or keep an established architecture.
 
@@ -32,7 +32,7 @@ This package should be listed in `Packages/com.actionfit.custompackagemanager/PA
 
 Requested router entry:
 
-- `Packages/com.actionfit.ai-codeconvention/AI_GUIDE.md` - AI Code Convention defines portable local-first Unity code-authoring guidance, read-only convention comparison, and authorized application boundaries. Read before comparing or applying shared code conventions.
+- `Packages/com.actionfit.ai-codeconvention/AI_GUIDE.md` - AI Code Convention defines portable Unity code-authoring rules, explicit profiles, API-owner routing, read-only retirement checks, and authorized application boundaries. Read before comparing or applying shared code conventions.
 
 If the router is not included in the consuming assistant's default reading sequence, connect it through an existing primary project entry point such as `PROJECT.md`, `AGENTS.md`, `CLAUDE.md`, or `GEMINI.md`. Do not silently create a new project documentation hierarchy.
 
@@ -50,14 +50,29 @@ Read this guide when:
 
 `AFCC-<DOMAIN>-<NUMBER>` identifiers are stable comparison keys. Do not renumber or reuse an identifier for a different meaning. If a rule's meaning must be replaced, add a new identifier and retain the old one as deprecated with a route to its successor. Shared-reference headings and line numbers are explanatory locations, not stable rule IDs.
 
+### `AFCC-PRO-001` — Select profiles explicitly
+
+`portable-core` is the default. Select another profile only through one exact line in the consuming repository's primary router:
+
+```text
+AI Code Convention profile: actionfit-unity
+```
+
+Do not infer a profile from a repository name, organization, folder layout, installed package, or existing source style. Report duplicate, unknown, or conflicting selectors instead of guessing. The selector is routing metadata, not a local convention body.
+
+### `AFCC-PRO-002` — Gate optional rules by evidenced capability
+
+A selected profile may contain dependency-specific rules. Activate one only when the relevant installed package, assembly, source, or public API is evidenced in the consuming repository. A convention check or application must never install a dependency, add a scripting symbol, or invent an API merely to activate a rule.
+
 ### `AFCC-PRE-001` — Discover authority before choosing a rule
 
 Apply guidance in this order:
 
 1. System, user, repository, and directory-scoped instructions, including the consuming repository's primary AI entry points.
-2. Project-local routers, architecture documents, coding conventions, safety rules, and approved migration procedures.
+2. Project-local safety and workflow rules, factual architecture, explicit profile selection, any still-approved local convention during migration, and approved migration procedures.
 3. The installed package guide that owns a concrete API or tool contract.
-4. This package's generic defaults when no higher authority defines the behavior.
+4. The explicitly selected package profile.
+5. This package's portable-core defaults when no higher authority defines the behavior.
 
 Do not combine conflicting rules into a new compromise. Report the conflict, cite both sources, and choose the higher local or API-owning authority. A local rule may extend a package default without conflict.
 
@@ -76,6 +91,10 @@ Inspect the current implementation, nearby style, ownership, call sites, seriali
 ### `AFCC-ADP-001` — Adopt progressively
 
 Apply these rules first to new files, new features, and isolated changes. Do not remodel an established project merely because its structure differs. Introduce EventBus, QueryBus, Command, registries, providers, or finer asmdef boundaries only when the observed ownership and scale require them.
+
+### `AFCC-STY-001` — Preserve established style when no selected rule applies
+
+When neither the selected profile nor a higher authority defines a style choice, preserve the touched file's established namespace, formatting, member ordering, and naming. Do not normalize neighboring code or migrate an existing namespace merely to make the file resemble an example in this package.
 
 ## Decision Contract
 
@@ -150,6 +169,74 @@ Keep Editor-only APIs and tooling out of Player compilation. Editor assemblies m
 
 When `com.actionfit.referencebinding` is installed, read its `AI_GUIDE.md` and use only the public APIs and menus documented by that version. This package does not define attributes, processing modes, bulk wiring, asset-saving APIs, or another ReferenceBinding implementation. If a local document names an API the installed package does not expose, report `Package/API Mismatch` and follow the installed package guide.
 
+## ActionFit Unity Profile Rules
+
+The following stable meanings are active only when `AFCC-PRO-001` selects `actionfit-unity`. Detailed selection examples and capability evidence live in `Skills~/Shared/references/profiles/actionfit-unity.md`.
+
+### `AFCC-ORG-001` — Organize classes by functional regions
+
+Use functional `#region` blocks for non-trivial ActionFit classes. Keep global fields and properties separate from feature-specific members. Use this order when a block exists: `Fields`, `Properties`, `Unity Lifecycle`, `Initialization`, `Public Methods`, `Private Methods`, `Event Handlers`. Do not add empty regions or reorganize untouched code solely for consistency.
+
+### `AFCC-CMT-001` — Keep comments useful and language-consistent
+
+Write new explanatory comments in Korean unless the touched file is clearly English-only. Document public method usage with XML summaries, explain non-obvious private or protected behavior briefly, and add concise same-line field or property comments where they provide meaning. Omit comments for self-explanatory code and simple expression-bodied getters.
+
+### `AFCC-LOG-001` — Keep diagnostics visible and searchable
+
+Write log messages in concise English using `[Owner] Action: detail`. Temporary investigation logs use the engine logger and a searchable `[DEBUG_Feature]` tag and are removed before completion. Editor tools and validation code use a logger proven to remain compiled and visible in the Editor; runtime code uses the consuming project's approved runtime logger. Never name or assume a project-specific logger or compilation symbol in this profile.
+
+### `AFCC-GRD-001` — Keep abnormal guard exits observable
+
+Before returning from a null, range, state, or other defensive guard that should not occur in normal flow, emit an error through the approved diagnostic path with enough owner and field context to investigate. Do not log expected absence such as an optional value, cache miss, capability probe, or normal false result as an error.
+
+### `AFCC-CPP-001` — Preserve method discoverability across compilation symbols
+
+Keep a method declaration searchable and put conditional compilation inside its body when the behavior varies by symbol. Conditional `using` directives and declarations that cannot compile without a platform-specific base type are exceptions. Do not duplicate whole method declarations across symbol branches when one stable declaration can contain the branch.
+
+### `AFCC-PRF-001` — Avoid scene-wide discovery in runtime paths
+
+Do not add runtime scene-wide `FindObjectOfType`, `FindObjectsByType`, or `FindAnyObjectByType` calls. Prefer an existing serialized or injected reference, approved owner/singleton, cached hierarchy lookup, or event/provider boundary. Editor-only tools may use scene-wide discovery when their scope and cost are explicit. An external API that requires discovery is an evidenced exception, not a reason to spread the pattern.
+
+### `AFCC-EAR-001` — Keep Editor asset references relocatable
+
+For Editor tools, do not encode a movable project asset or folder as a fixed path constant when the project already supports a serialized asset reference, GUID-backed lookup, or an evidenced project finder. Preserve the selected asset's GUID and make missing or ambiguous lookup visible. A package-owned immutable path and a script-relative generated output are evidenced exceptions. Concrete finder APIs remain factual project architecture or installed-owner contracts.
+
+### `AFCC-UTK-001` — Use UniTask when that capability is installed
+
+When UniTask is evidenced, use it for new asynchronous, delayed, and periodic work instead of introducing a coroutine. Preserve an `IEnumerator` flow when a Unity or external API requires that exact shape. Accept and propagate cancellation, pair owned cancellation sources with the active lifetime, use `WaitUntil` for condition waits instead of hand-written polling, and observe failures. Do not convert an unrelated existing coroutine merely because a nearby file is touched.
+
+### `AFCC-DUR-001` — Express gameplay durations in seconds
+
+Represent gameplay duration values as `float` seconds by default. Convert explicitly at an API boundary that requires milliseconds, ticks, frames, or another unit, and make the unit visible in the name or type when ambiguity remains.
+
+### `AFCC-LOP-001` — Use an evidenced project loop owner for periodic work
+
+When the consuming project documents a central loop owner, route new periodic runtime work through the appropriate evidenced loop phase instead of adding another `Update` or `LateUpdate`. Register and unregister at matching active lifetimes. Keep Unity lifecycle callbacks and external-SDK callbacks that are semantically tied to their component or required API. The concrete loop type and event names remain factual project architecture.
+
+### `AFCC-RFS-001` — Use the ActionFit serialized Refs shape
+
+Do not add `Tooltip` to a serialized field. Keep Inspector-connected component references and closely related presentation settings in a nested public `[Serializable]` `Refs` container with a public `refs` instance, and use concise same-line comments where they add meaning. Use a standalone serialized field when a container would obscure ownership. Concrete component wrapper types and supported reference-binding shapes belong to their installed owner guides.
+
+### `AFCC-SOS-001` — Select singleton ScriptableObjects by state ownership
+
+When `com.actionfit.sosingleton` is installed, use its documented singleton base and load contract only for one globally referenced configuration or catalog asset that does not require multiple variants. Keep per-character, per-item, per-season, mutable session, or otherwise multi-instance data in regular ScriptableObjects or runtime owners. Read the installed owner guide before naming the base type, Resources path, cache, or menu; package installation does not authorize creating or moving an asset.
+
+### `AFCC-TWN-001` — Preserve DOTween ownership when that capability is installed
+
+When DOTween is evidenced, never treat an auto-killed tween field or `IsActive()` result as ownership proof. For a fixed repeatable animation, create one non-auto-killed tween, restart it, and kill it at the owner's final lifetime. For variable animations, assign a class-owned unique ID and kill only that ID. Create natural one-shots without a retained field. A target-wide kill is permitted only when one system exclusively owns every tween on that target; shared targets require per-system IDs.
+
+### `AFCC-SER-003` — Use approved targeted serialized-key migration in this profile
+
+After explicit approval of a Unity-serialized field rename, use this profile's targeted key-only procedure when the consuming repository can prove text serialization, an exhaustive old-key scope, preserved values and object references, targeted diff inspection, and asset reload validation. Otherwise fall back to `AFCC-SER-002` or do not rename. An installed API owner may require a narrower migration contract. This rule never creates rename or asset-write authority.
+
+### `AFCC-UIF-001` — Route UI wrappers and localization to the installed owner
+
+When `com.actionfit.ui.foundation` is installed, use its documented public wrapper and localization contracts for relevant ActionFit UI work. Read the installed guide before selecting a concrete type, registration path, refresh lifecycle, migration command, or optional animation mode. If the owner is absent or its guide does not expose the needed behavior, report missing evidence or `Package/API Mismatch`; do not invent a wrapper or API.
+
+### `AFCC-RET-001` — Retire local convention authority only after a no-write gate
+
+Local convention documents may be removed only after a read-only shadow audit maps every normative item to portable core, the selected profile, an installed owner, factual architecture, or explicit retirement. The audit must also prove zero unresolved `Local Only` and `Conflict — Local Wins` rows, zero missing owner routes, zero stale links after removal, and zero package-to-installed-skill drift. Deletion remains a separately authorized repository operation; the check itself never writes.
+
 ## Convention Comparison Contract
 
 `code-convention-check` uses exactly six relationship categories:
@@ -163,9 +250,13 @@ When `com.actionfit.referencebinding` is installed, read its `AI_GUIDE.md` and u
 
 Every row includes the package rule ID, category, local or owner source path, effective rule, and recommended follow-up. The report cites sources, identifies missing evidence, and never claims that all source code complies. The `AFCC-REF-001` design-input exclusion is reported as an owned-package `Package/API Mismatch` whenever ReferenceBinding is installed, without falsely attributing the excluded design to local project documents.
 
+Retirement readiness is reported separately from these six categories. Read `Skills~/Shared/references/local-convention-retirement.md` for shadow and final gates, count definitions, stale-link checks, and skill-drift evidence. A readiness result is not source-code compliance proof and does not authorize deletion.
+
 ## Project-Specific Convention Boundary
 
-Keep project-selected async libraries and loop hubs, clock facades, serialized-field containers, UI wrapper types, comment and log language, tween ownership patterns, and serialization migration procedures in the consuming project's own guidance. Compare them as local extensions, local-only rules, or conflicts as appropriate; do not copy them into this portable package or initiate migration.
+Reusable organization choices may live in an explicitly selected package profile. Concrete project types, loop event names, clock facades, storage paths, popup interfaces, service adapters, asset keys, and current runtime ownership remain factual project architecture or installed API-owner guidance. Do not copy those project-only identifiers into portable core or an organization profile.
+
+A consuming project may operate with no local code-convention documents. Its primary router may contain only the package authority pointer and exact profile selector, while project safety, workflow, and factual architecture stay local for their separate responsibilities. If local convention documents remain during migration, compare them through the normal precedence and retirement contracts until removal is explicitly authorized.
 
 ## Validation And Reporting
 
@@ -181,9 +272,13 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 - `Skills~/manifest.json` registers schema v2 `code-convention-help`, `code-convention-check`, and `code-convention-apply` for Codex and Claude with prefix `code-convention`.
 - The help skill is read-only and reads generated `PACKAGE_SKILLS.md` as the authoritative inventory.
-- The check skill is read-only. It compares documented rules, uses the six stable relationship categories, and proves repository state did not change.
-- The apply skill is write-capable but may be selected only after the user authorizes a concrete Unity code change. It does not create edit authority or own Jira, Git branches, worktrees, pull requests, publishing, or deployment.
+- The help skill resolves and reports the selected profile, effective stable IDs, capability gates, and installed owner routes.
+- The check skill is read-only. It compares documented rules, uses the six stable relationship categories, reports shadow or final retirement readiness, detects package-to-installed-skill drift, and proves repository state did not change.
+- The apply skill is write-capable but may be selected only after the user authorizes a concrete Unity code change. It works without local convention documents by reading the selected profile and installed owner guides. Project architecture supplies concrete facts, not an independent convention body. The skill does not create edit authority or own Jira, Git branches, worktrees, pull requests, publishing, or deployment.
 - `Skills~/Shared/references/unity-code-authoring-rules.md` contains progressive details for architecture, communication, persistence, lifecycle, assets, assemblies, anti-patterns, and validation.
+- `Skills~/Shared/references/profiles/actionfit-unity.md` contains the opt-in profile's activation, capability, examples, and validation detail.
+- `Skills~/Shared/references/owner-routing.md` resolves concrete Time, UI Foundation, and ReferenceBinding contracts through installed guides.
+- `Skills~/Shared/references/local-convention-retirement.md` defines the no-write shadow and final retirement gates.
 - Custom Package Manager installs project-local copies and preserves unknown, modified, file-backed, or linked targets. Do not author `PACKAGE_SKILLS.md` in package sources.
 
 ## Package Tools Menu
@@ -195,7 +290,7 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 ## Release And Distribution Boundary
 
-- This `0.1.0` draft is Private because its design input does not include a public redistribution license notice.
+- This `0.2.0` candidate is Private because its design input does not include a public redistribution license notice.
 - A separate ownership and distribution-rights review is required before changing visibility or publishing publicly.
 - Publishing is manual through Custom Package Manager. Do not create a repository, push, tag, append a catalog row, deploy, or install into global/home skill directories without separate authorization.
 - Before any later release, re-check remote tags and align `package.json`, README, this guide, PackageInfo, and release notes.

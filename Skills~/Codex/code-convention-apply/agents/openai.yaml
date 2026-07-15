@@ -1,6 +1,6 @@
 interface:
   display_name: "Apply Code Conventions"
-  short_description: "Apply effective rules to authorized Unity edits"
-  default_prompt: "Use $code-convention-apply after authorizing a Unity code change to apply local-first conventions within that scope."
+  short_description: "Apply profile rules to authorized Unity edits"
+  default_prompt: "Use $code-convention-apply after authorizing a Unity code change to apply the selected profile and owner contracts within that scope."
 policy:
   allow_implicit_invocation: true
