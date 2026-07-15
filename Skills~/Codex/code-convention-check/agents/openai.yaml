@@ -1,0 +1,4 @@
+interface:
+  display_name: "Check Code Conventions"
+  short_description: "Compare local and package Unity conventions"
+  default_prompt: "Use $code-convention-check to compare project-local conventions with package defaults without changing files."

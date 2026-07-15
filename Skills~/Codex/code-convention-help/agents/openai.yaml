@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Code Convention Help"
+  short_description: "Explain portable Unity code-authoring rules"
+  default_prompt: "Use $code-convention-help to explain the package rules, installed skills, and safety boundaries."

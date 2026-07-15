@@ -1,0 +1,25 @@
+{
+  "schemaVersion": 2,
+  "skillPrefix": "code-convention",
+  "helpSkill": "code-convention-help",
+  "skills": [
+    {
+      "name": "code-convention-help",
+      "agents": ["codex", "claude"],
+      "includeShared": true,
+      "access": "read-only"
+    },
+    {
+      "name": "code-convention-check",
+      "agents": ["codex", "claude"],
+      "includeShared": true,
+      "access": "read-only"
+    },
+    {
+      "name": "code-convention-apply",
+      "agents": ["codex", "claude"],
+      "includeShared": true,
+      "access": "write-capable"
+    }
+  ]
+}
