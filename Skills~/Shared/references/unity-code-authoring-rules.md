@@ -150,7 +150,9 @@ Treat these as compatibility contracts:
 
 Before a rename, move, copy, or migration, read the project's approved procedure. Preserve an existing `.meta` when retaining identity; let Unity create a new GUID for a genuinely independent asset. Never duplicate a GUID in one AssetDatabase. Avoid broad YAML rewrites and remove unrelated serialization churn.
 
-Serialized-reference attributes, validation, and repair APIs belong to the installed ReferenceBinding package when present. Read `com.actionfit.referencebinding/AI_GUIDE.md`; do not infer write or save operations from this generic reference.
+When the selected profile activates `AFCC-SER-004`, treat Inspector-authored serialized inputs as immutable runtime input. Keep their backing fields private, expose getter-only access, and move changing values into a separate runtime model. Editor-only authoring may establish those fields before Play Mode, but runtime code must not replace the stored values or reference identities. A getter-only reference does not make the referenced object's own mutable state immutable.
+
+Serialized-reference attributes, validation, and repair APIs belong to the required ReferenceBinding owner package. Read `com.actionfit.referencebinding/AI_GUIDE.md`; do not infer write or save operations from this generic reference. Its package dependency makes the Runtime assembly available to predefined assemblies, but a custom consuming asmdef still needs an explicit `com.actionfit.referencebinding` reference.
 
 Assembly direction:
 
@@ -181,6 +183,7 @@ Flag these patterns before adding more of them:
 - fixed Editor project paths for movable asset or folder references when a serialized or GUID-backed route exists;
 - singleton ScriptableObject selected without proving single-instance configuration ownership or reading its installed owner;
 - serialized rename, GUID change, asset reset, or reserialization without an approved migration;
+- public setters, mutation methods, or runtime assignments for profile-owned Inspector inputs that `AFCC-SER-004` requires to remain read-only;
 - persistence schema change without fixtures and recovery;
 - public API change mixed with unrelated refactoring.
 - profile or optional-library behavior inferred without an exact selector and capability evidence;

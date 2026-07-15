@@ -1,0 +1,24 @@
+{
+    "name": "com.actionfit.ai-codeconvention.Editor.Tests",
+    "rootNamespace": "ActionFit.AICodeConvention.Editor.Tests",
+    "references": [
+        "com.actionfit.ai-codeconvention.Editor",
+        "com.actionfit.referencebinding"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": false,
+    "defineConstraints": [
+        "UNITY_INCLUDE_TESTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false,
+    "optionalUnityReferences": [
+        "TestAssemblies"
+    ]
+}

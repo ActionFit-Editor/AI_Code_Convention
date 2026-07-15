@@ -19,6 +19,22 @@ OWNER_ROUTING_REFERENCE = SKILLS_ROOT / "Shared" / "references" / "owner-routing
 RETIREMENT_REFERENCE = (
     SKILLS_ROOT / "Shared" / "references" / "local-convention-retirement.md"
 )
+SCRIPT_TEMPLATE = (
+    PACKAGE_ROOT
+    / "Editor"
+    / "ScriptTemplates"
+    / "ActionFitConventionMonoBehaviour.cs.txt"
+)
+SCRIPT_TEMPLATE_MENU = (
+    PACKAGE_ROOT / "Editor" / "Scripts" / "AICodeConventionScriptTemplateMenu.cs"
+)
+SCRIPT_TEMPLATE_COMPILE_PROBE = (
+    PACKAGE_ROOT
+    / "Tests"
+    / "Editor"
+    / "Fixtures"
+    / "GeneratedConventionProbe.cs"
+)
 SKILL_NAMES = (
     "code-convention-help",
     "code-convention-check",
@@ -42,10 +58,13 @@ PROFILE_RULE_IDS = (
     "AFCC-GRD-001",
     "AFCC-CPP-001",
     "AFCC-PRF-001",
+    "AFCC-INT-001",
     "AFCC-UTK-001",
     "AFCC-DUR-001",
     "AFCC-LOP-001",
     "AFCC-RFS-001",
+    "AFCC-RFS-002",
+    "AFCC-SER-004",
     "AFCC-TWN-001",
     "AFCC-SER-003",
     "AFCC-UIF-001",
@@ -111,6 +130,11 @@ class CodeConventionSkillTests(unittest.TestCase):
             self.assertIn("references/owner-routing.md", contents)
             self.assertIn("references/local-convention-retirement.md", contents)
             self.assertIn("com.actionfit.referencebinding/AI_GUIDE.md", contents)
+            self.assertIn(
+                "Assets > Create > Scripting > ActionFit Convention MonoBehaviour Script",
+                contents,
+            )
+            self.assertIn("general-purpose code-generation framework", contents)
 
         authored_inventory = list(SKILLS_ROOT.rglob("PACKAGE_SKILLS.md"))
         self.assertEqual([], authored_inventory)
@@ -131,6 +155,8 @@ class CodeConventionSkillTests(unittest.TestCase):
             self.assertIn("Keep the entire check read-only", contents)
             self.assertIn("not source-code compliance proof", contents)
             self.assertIn("`AFCC-REF-001`", contents)
+            self.assertIn("always resolve the required `com.actionfit.referencebinding` owner", contents)
+            self.assertIn("missing owner route", contents)
             self.assertIn("intentionally excluded design-input specialization", contents)
             self.assertIn("Do not claim that the consuming project's local docs contain", contents)
             self.assertIn("package rule ID `N/A`", contents)
@@ -150,6 +176,8 @@ class CodeConventionSkillTests(unittest.TestCase):
             self.assertIn("references/unity-code-authoring-rules.md", contents)
             self.assertIn("references/profiles/actionfit-unity.md", contents)
             self.assertIn("references/owner-routing.md", contents)
+            self.assertIn("resolve the required `com.actionfit.referencebinding/AI_GUIDE.md`", contents)
+            self.assertIn("stop before authoring serialized-reference code", contents)
             self.assertIn("Continue normally when local convention documents are absent", contents)
 
         metadata = (
@@ -205,14 +233,138 @@ class CodeConventionSkillTests(unittest.TestCase):
         self.assertNotIn("AutoWireValidateAndSave", guide)
         self.assertNotIn("ReferenceProcessMode", guide)
 
-    def test_package_is_guidance_only_and_uses_published_installer_dependency(self) -> None:
+    def test_package_is_editor_only_and_uses_published_required_dependencies(self) -> None:
         manifest = json.loads((PACKAGE_ROOT / "package.json").read_text(encoding="utf-8"))
-        self.assertEqual("0.2.0", manifest["version"])
+        self.assertEqual("0.3.2", manifest["version"])
         self.assertEqual(
-            "1.1.84",
-            manifest["dependencies"]["com.actionfit.custompackagemanager"],
+            {
+                "com.actionfit.custompackagemanager": "1.1.84",
+                "com.actionfit.referencebinding": "0.1.0",
+            },
+            manifest["dependencies"],
         )
         self.assertFalse((PACKAGE_ROOT / "Runtime").exists())
+        self.assertTrue(SCRIPT_TEMPLATE.is_file())
+        self.assertTrue(SCRIPT_TEMPLATE_MENU.is_file())
+
+    def test_editor_script_generator_uses_native_flow_and_safe_starter(self) -> None:
+        menu = SCRIPT_TEMPLATE_MENU.read_text(encoding="utf-8")
+        template = SCRIPT_TEMPLATE.read_text(encoding="utf-8")
+        compile_probe = SCRIPT_TEMPLATE_COMPILE_PROBE.read_text(encoding="utf-8")
+        readme = (PACKAGE_ROOT / "README.md").read_text(encoding="utf-8")
+        guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
+
+        menu_path = "Assets/Create/Scripting/ActionFit Convention MonoBehaviour Script"
+        template_path = (
+            "Packages/com.actionfit.ai-codeconvention/Editor/ScriptTemplates/"
+            "ActionFitConventionMonoBehaviour.cs.txt"
+        )
+        self.assertIn(f'[MenuItem("{menu_path}"', menu)
+        self.assertEqual(
+            1,
+            menu.count("ProjectWindowUtil.CreateScriptAssetFromTemplateFile"),
+        )
+        self.assertIn(f'"{template_path}"', menu)
+        self.assertIn('"NewActionFitMonoBehaviour.cs"', menu)
+        for custom_write_api in (
+            "File.",
+            "Directory.",
+            "System.IO",
+            "StreamWriter",
+            "WriteAllText",
+            "Delete(",
+            "Move(",
+            "Copy(",
+            "AssetDatabase.",
+        ):
+            self.assertNotIn(custom_write_api, menu)
+
+        for token in (
+            "#SCRIPTNAME#",
+            "#ROOTNAMESPACEBEGIN#",
+            "#ROOTNAMESPACEEND#",
+        ):
+            self.assertEqual(1, template.count(token))
+        for container in ("Refs", "Assets", "Settings"):
+            self.assertIn(f"public sealed class {container}", template)
+        for serialized_field in (
+            "[SerializeField] private Refs refs = new();",
+            "[SerializeField] private Assets assets = new();",
+            "[SerializeField] private Settings settings = new();",
+            "private Transform contentRoot;",
+            "private Sprite iconSprite;",
+            "[SerializeField] private float animationDurationSeconds = 0.25f;",
+        ):
+            self.assertIn(serialized_field, template)
+        for getter in (
+            "public Refs References => refs;",
+            "public Assets AssetReferences => assets;",
+            "public Settings Configuration => settings;",
+            "public Transform ContentRoot => contentRoot;",
+            "public Sprite IconSprite => iconSprite;",
+            "public float AnimationDurationSeconds => animationDurationSeconds;",
+        ):
+            self.assertIn(getter, template)
+        for reference_binding_contract in (
+            "using ReferenceBinding;",
+            '[RequiredReference("CONTENT_ROOT_MISSING")]',
+            '[RequiredReference("ICON_SPRITE_MISSING")]',
+            '[AutoWireChild("ContentRoot")]',
+            "private void OnValidate()",
+            "#if UNITY_EDITOR",
+            "ReferenceBindingRequests.Enqueue(this);",
+            "#endif",
+        ):
+            self.assertIn(reference_binding_contract, template)
+        self.assertIn(
+            "private void OnValidate()\n"
+            "    {\n"
+            "#if UNITY_EDITOR\n"
+            "        ReferenceBindingRequests.Enqueue(this);\n"
+            "#endif\n"
+            "    }",
+            template,
+        )
+        self.assertEqual(2, template.count("RequiredReference"))
+        self.assertEqual(1, template.count("AutoWireChild"))
+        self.assertEqual(1, template.count("ReferenceBindingRequests.Enqueue(this)"))
+        for excluded in (
+            " set;",
+            "ReferenceBinding.Editor",
+            "void Start",
+            "void Update",
+            "Tooltip",
+        ):
+            self.assertNotIn(excluded, template)
+
+        rendered = (
+            template.replace("#SCRIPTNAME#", "GeneratedConventionProbe")
+            .replace(
+                "    #ROOTNAMESPACEBEGIN#",
+                "namespace ActionFit.TemplateSmoke\n{",
+            )
+            .replace("#ROOTNAMESPACEEND#", "}")
+        )
+        self.assertEqual(rendered, compile_probe)
+
+        test_asmdef = json.loads(
+            (
+                PACKAGE_ROOT
+                / "Tests"
+                / "Editor"
+                / "com.actionfit.ai-codeconvention.Editor.Tests.asmdef"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertIn("com.actionfit.referencebinding", test_asmdef["references"])
+
+        for docs in (readme, guide):
+            self.assertIn(menu_path.replace("/", " > "), docs)
+        self.assertIn("does not select a profile", readme)
+        self.assertIn("required dependency", readme)
+        self.assertIn("does not read or write the repository's profile selector", guide)
+        self.assertIn("RequiredReference", guide)
+        self.assertIn("AutoWireChild", guide)
+        self.assertIn("Package updates never rewrite generated scripts", guide)
 
     def test_stable_rule_headings_are_unique(self) -> None:
         guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
@@ -246,7 +398,7 @@ class CodeConventionSkillTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             self._resolve_profile("AI Code Convention profile: inferred\n")
 
-    def test_capability_gates_do_not_create_dependencies(self) -> None:
+    def test_optional_capability_gates_do_not_create_unrelated_dependencies(self) -> None:
         profile = PROFILE_REFERENCE.read_text(encoding="utf-8")
         manifest = json.loads((PACKAGE_ROOT / "package.json").read_text(encoding="utf-8"))
 
@@ -255,9 +407,61 @@ class CodeConventionSkillTests(unittest.TestCase):
         self.assertIn("com.actionfit.sosingleton", profile)
         self.assertIn("do not install UniTask", profile)
         self.assertEqual(
-            {"com.actionfit.custompackagemanager": "1.1.84"},
+            {
+                "com.actionfit.custompackagemanager": "1.1.84",
+                "com.actionfit.referencebinding": "0.1.0",
+            },
             manifest["dependencies"],
         )
+
+    def test_actionfit_serialized_inputs_are_role_split_and_runtime_read_only(self) -> None:
+        guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
+        profile = PROFILE_REFERENCE.read_text(encoding="utf-8")
+
+        deprecated_refs = guide.split("### `AFCC-RFS-001`", 1)[1].split(
+            "### `AFCC-RFS-002`", 1
+        )[0]
+        self.assertIn("Deprecated", deprecated_refs)
+        self.assertIn("`AFCC-RFS-002`", deprecated_refs)
+        self.assertIn("`AFCC-SER-004`", deprecated_refs)
+        for rule_id in ("AFCC-RFS-001", "AFCC-RFS-002", "AFCC-SER-004"):
+            self.assertIn(rule_id, profile)
+        self.assertIn("AFCC-RFS-002", guide)
+        self.assertIn("AFCC-SER-004", guide)
+        for container in ("`Refs`", "`Assets`", "`Settings`"):
+            self.assertIn(container, guide)
+            self.assertIn(container, profile)
+        self.assertIn("owner GameObject or any descendant", guide)
+        self.assertIn("private `[SerializeField]` backing fields", guide)
+        self.assertIn("getter-only", guide)
+        self.assertIn("Do not expose setters or mutation methods", guide)
+        self.assertIn("separately owned runtime model", guide)
+        self.assertIn("never `AutoWireChild`", profile)
+        self.assertIn("does not search the AssetDatabase", profile)
+
+        for agent in ("Codex", "Claude"):
+            apply_skill = self._read_skill(agent, "code-convention-apply")
+            self.assertIn("`AFCC-RFS-002`", apply_skill)
+            self.assertIn("`AFCC-SER-004`", apply_skill)
+            self.assertIn("getter-only access", apply_skill)
+            self.assertIn("separate runtime model", apply_skill)
+
+    def test_actionfit_interfaces_require_evidenced_production_contracts(self) -> None:
+        guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
+        profile = PROFILE_REFERENCE.read_text(encoding="utf-8")
+        readme = (PACKAGE_ROOT / "README.md").read_text(encoding="utf-8")
+
+        rule = guide.split("### `AFCC-INT-001`", 1)[1].split("### `AFCC-", 1)[0]
+        self.assertIn("`AFCC-COM-001`", rule)
+        self.assertIn("two or more active production implementations", rule)
+        self.assertIn("Unit-test substitution alone is insufficient", rule)
+        self.assertIn("Existing interfaces are not automatic migration targets", rule)
+        self.assertIn("Do not mechanically replace an interface with an abstract class", rule)
+        self.assertIn("one implementation", profile)
+        self.assertIn("service locator", profile)
+        self.assertIn("separate authority", profile)
+        self.assertIn("prefers concrete ownership", readme)
+        self.assertIn("Existing interfaces are not automatic migration targets", readme)
 
     def test_owner_routes_use_installed_guides_without_inventing_apis(self) -> None:
         routing = OWNER_ROUTING_REFERENCE.read_text(encoding="utf-8")
@@ -295,13 +499,26 @@ class CodeConventionSkillTests(unittest.TestCase):
             self.assertNotIn(identifier, combined)
 
     def test_readme_and_guide_use_the_release_candidate_repository(self) -> None:
+        manifest = json.loads((PACKAGE_ROOT / "package.json").read_text(encoding="utf-8"))
         readme = (PACKAGE_ROOT / "README.md").read_text(encoding="utf-8")
         guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
+        package_info = (
+            PACKAGE_ROOT
+            / "Editor"
+            / "PackageInfo"
+            / "ActionFitPackageInfo_SO.asset"
+        ).read_text(encoding="utf-8")
 
         repository = "https://github.com/ActionFitGames/AI_Code_Convention.git"
-        self.assertIn(f"{repository}#0.2.0", readme)
+        version = manifest["version"]
+        self.assertEqual("0.3.2", version)
+        self.assertIn(f"{repository}#{version}", readme)
         self.assertIn(repository, guide)
-        self.assertIn("Current package version at generation time: `0.2.0`", guide)
+        self.assertIn(f"Current package version at generation time: `{version}`", guide)
+        self.assertIn(f"This `{version}` candidate", guide)
+        self.assertIn(f"`{version}`", package_info)
+        self.assertIn("AFCC-INT-001", package_info)
+        self.assertNotIn("`0.3.0`", package_info)
 
     def test_shell_wrapper_runs_the_python_contract_suite(self) -> None:
         script = PACKAGE_ROOT / "Tests" / "Shell" / "run-tests.sh"
@@ -315,7 +532,8 @@ class CodeConventionSkillTests(unittest.TestCase):
             path
             for path in PACKAGE_ROOT.rglob("*")
             if path.is_file()
-            and path.suffix.lower() in {".md", ".json", ".yaml", ".cs", ".asmdef"}
+            and path.suffix.lower()
+            in {".md", ".json", ".yaml", ".cs", ".asmdef", ".txt"}
         ]
         combined = "\n".join(path.read_text(encoding="utf-8") for path in text_files)
 

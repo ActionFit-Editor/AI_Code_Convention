@@ -1,6 +1,6 @@
 # AI Guide - AI Code Convention
 
-This file is the portable authority for generic Unity code-authoring rules distributed by this package. It is intentionally guidance-only: it does not provide Runtime systems, gameplay architecture, code generation, analyzers, formatters, or asset mutation tools.
+This file is the portable authority for generic Unity code-authoring rules distributed by this package. The package also provides one narrow Editor-only MonoBehaviour starter generator. It does not provide Runtime systems, gameplay architecture, analyzers, formatters, a general-purpose code-generation framework, or migration tools.
 
 ## Package Identity
 
@@ -8,17 +8,30 @@ This file is the portable authority for generic Unity code-authoring rules distr
 - Display name: AI Code Convention
 - Repository: `https://github.com/ActionFitGames/AI_Code_Convention.git`
 - Repository visibility: Private
-- Current package version at generation time: `0.2.0`
+- Current package version at generation time: `0.3.2`
 - Unity version: `6000.2`
 - Custom Package Manager dependency: published `1.1.84`
+- ReferenceBinding dependency: published `0.1.0`
 
 ## Purpose And Boundary
 
-Use this package to choose safe, reusable defaults when authoring or changing Unity code, opt in to an organization profile through explicit routing metadata, resolve concrete APIs through their installed owners, compare documented contracts, and apply only the effective rules within an already authorized change.
+Use this package to choose safe, reusable defaults when authoring or changing Unity code, opt in to an organization profile through explicit routing metadata, resolve concrete APIs through their installed owners, compare documented contracts, apply only the effective rules within an already authorized change, and explicitly create a new ActionFit convention starter script when that shape is desired.
 
 The package does not require a particular class or folder layout. Names such as `SceneController`, `GameplayRoot`, `GameSession`, and `FeatureRoot` describe conceptual responsibilities only. A consuming project may use different names, split the roles differently, or keep an established architecture.
 
 The package does not prove that existing source code complies with its guidance. `code-convention-check` compares documented contracts and installed package APIs; source-wide linting and automatic remediation are outside its scope.
+
+## Editor Script Template Contract
+
+- `Assets > Create > Scripting > ActionFit Convention MonoBehaviour Script` invokes Unity's native `ProjectWindowUtil.CreateScriptAssetFromTemplateFile` flow with a package-owned immutable template path and default file name `NewActionFitMonoBehaviour.cs`.
+- The template uses Unity's `#SCRIPTNAME#`, `#ROOTNAMESPACEBEGIN#`, and `#ROOTNAMESPACEEND#` tokens. Unity owns destination selection, rename interaction, class-name replacement, root-namespace expansion, and existing-file handling.
+- The generated starter contains example `Refs`, `Assets`, and `Settings` containers under `AFCC-RFS-002`, private `[SerializeField]` backing fields and getter-only access under `AFCC-SER-004`, and no empty lifecycle methods.
+- `Refs.contentRoot` uses `RequiredReference("CONTENT_ROOT_MISSING")` and `AutoWireChild("ContentRoot")`. The exact GameObject name is the AutoWire search key, while the Required string is a diagnostic identifier. `Assets.iconSprite` uses `RequiredReference("ICON_SPRITE_MISSING")` without `AutoWireChild`; `Settings` has no reference attributes.
+- The searchable `OnValidate` declaration keeps `ReferenceBindingRequests.Enqueue(this)` inside `#if UNITY_EDITOR`. It enqueues the owning `MonoBehaviour`, never a nested container, and does not reference `ReferenceBinding.Editor` from generated runtime code.
+- `com.actionfit.referencebinding@0.1.0` is a required package dependency and owns attribute, processing, validation, Play Mode, Dirty-state, and save behavior. The generator never saves a Scene or Prefab. It also never replaces a valid manual reference or defines a second reference-processing API.
+- The generated output compiles in Unity predefined assemblies through ReferenceBinding's auto-referenced Runtime assembly. A consuming custom asmdef must explicitly reference `com.actionfit.referencebinding`; package installation alone does not add that assembly reference, and this generator does not mutate consuming asmdefs.
+- Invoking this menu is an explicit request for the `actionfit-unity` starter shape. It does not read or write the repository's profile selector, infer a profile, create or change an asmdef, overwrite or migrate existing scripts, or enforce runtime immutability mechanically.
+- The generated file is user-owned after creation. Replace the example fields with feature-specific inputs while preserving the selected effective rules. Package updates never rewrite generated scripts, and the starter alone is not source-compliance proof.
 
 ## Design Input Provenance And Exclusions
 
@@ -41,6 +54,7 @@ Read this guide when:
 - explaining or applying the portable Unity code-authoring defaults;
 - comparing package defaults with a consuming project's local conventions;
 - changing files under `Packages/com.actionfit.ai-codeconvention/`;
+- changing or diagnosing the convention script template or its Unity creation menu;
 - changing the three `code-convention-*` skills or their shared reference;
 - preparing this package for a later manual release.
 
@@ -167,7 +181,7 @@ Keep Editor-only APIs and tooling out of Player compilation. Editor assemblies m
 
 ### `AFCC-REF-001` — Defer serialized-reference APIs to their owner
 
-When `com.actionfit.referencebinding` is installed, read its `AI_GUIDE.md` and use only the public APIs and menus documented by that version. This package does not define attributes, processing modes, bulk wiring, asset-saving APIs, or another ReferenceBinding implementation. If a local document names an API the installed package does not expose, report `Package/API Mismatch` and follow the installed package guide.
+This package requires `com.actionfit.referencebinding`. Read its installed `AI_GUIDE.md` and use only the public APIs and menus documented by that version. The dependency makes the owner available but does not add references to consuming custom asmdefs. This package does not define attributes, processing modes, bulk wiring, asset-saving APIs, or another ReferenceBinding implementation. If a local document names an API the installed package does not expose, report `Package/API Mismatch` and follow the installed package guide.
 
 ## ActionFit Unity Profile Rules
 
@@ -197,6 +211,12 @@ Keep a method declaration searchable and put conditional compilation inside its 
 
 Do not add runtime scene-wide `FindObjectOfType`, `FindObjectsByType`, or `FindAnyObjectByType` calls. Prefer an existing serialized or injected reference, approved owner/singleton, cached hierarchy lookup, or event/provider boundary. Editor-only tools may use scene-wide discovery when their scope and cost are explicit. An external API that requires discovery is an evidenced exception, not a reason to spread the pattern.
 
+### `AFCC-INT-001` — Prefer concrete ownership over speculative interfaces
+
+For new ActionFit code, prefer a concrete owner type and a direct, serialized, or injected reference. Do not add an interface solely for one implementation, a speculative future replacement, dependency-injection registration, test substitution, naming symmetry, or to hide unclear ownership or dependency direction. Treat the query or read-only runtime interface permitted by `AFCC-COM-001` as an evidenced exception after considering a concrete owner or query API.
+
+An interface is justified only when an installed or external API owner requires it, two or more active production implementations must be interchangeable, platform or runtime variants need one stable consumer contract, or a stable cross-assembly ownership boundary cannot remain one-way without a small implementation-free contract. Keep an accepted interface narrow, consumer-oriented, and read-only by default; route mutations through an explicit owner API or command. Resolve and cache the dependency once instead of repeatedly locating an interface in a hot path. Existing interfaces are not automatic migration targets and require separate change authority. Do not mechanically replace an interface with an abstract class; use an abstract base only when real shared state, behavior, or inheritance semantics exist. Unit-test substitution alone is insufficient unless the same boundary represents a real production adapter or owner contract.
+
 ### `AFCC-EAR-001` — Keep Editor asset references relocatable
 
 For Editor tools, do not encode a movable project asset or folder as a fixed path constant when the project already supports a serialized asset reference, GUID-backed lookup, or an evidenced project finder. Preserve the selected asset's GUID and make missing or ambiguous lookup visible. A package-owned immutable path and a script-relative generated output are evidenced exceptions. Concrete finder APIs remain factual project architecture or installed-owner contracts.
@@ -213,9 +233,17 @@ Represent gameplay duration values as `float` seconds by default. Convert explic
 
 When the consuming project documents a central loop owner, route new periodic runtime work through the appropriate evidenced loop phase instead of adding another `Update` or `LateUpdate`. Register and unregister at matching active lifetimes. Keep Unity lifecycle callbacks and external-SDK callbacks that are semantically tied to their component or required API. The concrete loop type and event names remain factual project architecture.
 
-### `AFCC-RFS-001` — Use the ActionFit serialized Refs shape
+### `AFCC-RFS-001` — Deprecated: use the original mixed public Refs shape only for compatibility
 
-Do not add `Tooltip` to a serialized field. Keep Inspector-connected component references and closely related presentation settings in a nested public `[Serializable]` `Refs` container with a public `refs` instance, and use concise same-line comments where they add meaning. Use a standalone serialized field when a container would obscure ownership. Concrete component wrapper types and supported reference-binding shapes belong to their installed owner guides.
+This rule retains the original meaning for existing serialized code: Inspector-connected component references and closely related presentation settings may remain in a nested public `[Serializable]` `Refs` container with a public `refs` instance. Do not apply this mixed public shape to new or deliberately revised fields. Use `AFCC-RFS-002` and `AFCC-SER-004` instead. Moving an existing field out of `refs` changes its serialized property path and requires separately approved migration and asset validation.
+
+### `AFCC-RFS-002` — Separate ActionFit serialized inputs by role
+
+For new or deliberately revised ActionFit serialized inputs, use nested public sealed `[Serializable]` containers with distinct roles. `Refs` contains only `Component` references from the owner GameObject or any descendant, including inactive descendants. `Assets` contains only persistent external Unity asset references such as sprites, materials, audio clips, ScriptableObjects, and prefab assets. `Settings` contains numeric and other non-reference Inspector-authored configuration values, not runtime state, mutable collections, save DTOs, or persistence schemas. Keep every container's serialized backing fields private and expose getter-only properties under `AFCC-SER-004`. Do not add `Tooltip`. A standalone serialized field remains valid when a container would obscure ownership. Concrete component wrappers, attribute support, persistence checks, and reference-binding shapes belong to their installed owner guides.
+
+### `AFCC-SER-004` — Keep Inspector-authored inputs runtime-read-only
+
+Establish a serialized input only through a declaration default, Unity deserialization, or explicit Editor-only authoring while the application is not playing or entering Play Mode. Use private `[SerializeField]` backing fields and getter-only accessors for `Refs`, `Assets`, `Settings`, and their contained values. Do not expose setters or mutation methods, and do not reassign a container, reference identity, or setting from runtime code. When gameplay needs a changing value, copy the authored input into a separately owned runtime model and mutate that state instead. This rule freezes the stored value or reference identity; it does not make the referenced Component or asset object's own state immutable. Editor attributes, `SerializedObject`, and installed owner tooling may author private fields before Play Mode, but must not create a Player or Play-Mode mutation path. Getter-only guidance does not mechanically block reflection or manual Play-Mode Inspector edits; a consuming project that needs enforcement beyond ordinary C# access must use an explicitly owned analyzer or custom Inspector rather than claiming this guidance alone provides it.
 
 ### `AFCC-SOS-001` — Select singleton ScriptableObjects by state ownership
 
@@ -248,7 +276,7 @@ Local convention documents may be removed only after a read-only shadow audit ma
 - `Local Only`: no package counterpart exists; use `N/A` for the package rule ID.
 - `Package/API Mismatch`: a generic, historical design-input, or local claim exceeds the installed owner package's real public surface; the installed owner guide wins.
 
-Every row includes the package rule ID, category, local or owner source path, effective rule, and recommended follow-up. The report cites sources, identifies missing evidence, and never claims that all source code complies. The `AFCC-REF-001` design-input exclusion is reported as an owned-package `Package/API Mismatch` whenever ReferenceBinding is installed, without falsely attributing the excluded design to local project documents.
+Every row includes the package rule ID, category, local or owner source path, effective rule, and recommended follow-up. The report cites sources, identifies missing evidence, and never claims that all source code complies. The `AFCC-REF-001` design-input exclusion is reported as an owned-package `Package/API Mismatch` against the required ReferenceBinding owner, without falsely attributing the excluded design to local project documents.
 
 Retirement readiness is reported separately from these six categories. Read `Skills~/Shared/references/local-convention-retirement.md` for shadow and final gates, count definitions, stale-link checks, and skill-drift evidence. A readiness result is not source-code compliance proof and does not authorize deletion.
 
@@ -285,12 +313,19 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 - Unity menu root: `Tools/Package/AI Code Convention/`.
 - `README` opens the installed package README.
-- The package has no settings asset or executable Unity command.
-- Keep it in the README-only priority band.
+- `Assets/Create/Scripting/ActionFit Convention MonoBehaviour Script` creates one new convention starter through Unity's native Project window flow.
+- The package has no settings asset. Keep the `Tools/Package` README entry in its existing README priority band; the creation command remains under `Assets/Create/Scripting`.
+
+## Package Validation
+
+- Run `Tests/Shell/run-tests.sh` for the package guidance, metadata, skill-parity, menu-source, and template-text contracts.
+- Run the `com.actionfit.ai-codeconvention.Editor.Tests` EditMode assembly to prove the package template is importable through its virtual `Packages/` path, retains the Unity tokens and runtime-read-only role shape, compiles against the ReferenceBinding Runtime assembly, and preserves the declared attributes and Editor-guarded owner queue.
+- Run isolated Unity package validation after Editor menu, template, asmdef, or test changes.
+- Before release, perform one interactive smoke test in a disposable predefined-assembly destination and one destination whose custom asmdef already references `com.actionfit.referencebinding`: create, rename, confirm root namespace expansion, compile, and remove only the smoke-test output. Do not use an existing user script as the target or edit an asmdef merely for the smoke test.
 
 ## Release And Distribution Boundary
 
-- This `0.2.0` candidate is Private because its design input does not include a public redistribution license notice.
+- This `0.3.2` candidate is Private because its design input does not include a public redistribution license notice.
 - A separate ownership and distribution-rights review is required before changing visibility or publishing publicly.
 - Publishing is manual through Custom Package Manager. Do not create a repository, push, tag, append a catalog row, deploy, or install into global/home skill directories without separate authorization.
 - Before any later release, re-check remote tags and align `package.json`, README, this guide, PackageInfo, and release notes.

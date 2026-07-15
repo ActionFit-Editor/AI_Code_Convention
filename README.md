@@ -1,23 +1,32 @@
 # AI Code Convention (com.actionfit.ai-codeconvention)
 
-Portable Unity code-authoring guidance for Codex and Claude. The package combines a portable core with explicitly selected profiles, routes concrete APIs to their installed owners, and applies effective rules only inside a user-authorized code change.
+Portable Unity code-authoring guidance for Codex and Claude. The package combines a portable core with explicitly selected profiles, routes concrete APIs to their installed owners, applies effective rules only inside a user-authorized code change, and provides one opt-in ActionFit MonoBehaviour starter template with required ReferenceBinding support.
 
-This package remains a **Private** guidance package. It contains no Runtime assembly, EventBus implementation, gameplay framework, analyzer, formatter, or code generator.
+This package remains **Private**. It contains no Runtime assembly, EventBus implementation, gameplay framework, analyzer, formatter, or general-purpose code-generation framework. Its Editor-only generator creates one new convention starter script through Unity's native Project window flow.
 
 ## Install
 
 ```json
 {
   "dependencies": {
-    "com.actionfit.ai-codeconvention": "https://github.com/ActionFitGames/AI_Code_Convention.git#0.2.0"
+    "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.84",
+    "com.actionfit.referencebinding": "https://github.com/ActionFit-Editor/ReferenceBinding.git#0.1.0",
+    "com.actionfit.ai-codeconvention": "https://github.com/ActionFitGames/AI_Code_Convention.git#0.3.2"
   }
 }
 ```
 
+Custom Package Manager resolves the two declared ActionFit dependencies when installing from its catalog. Direct Git UPM consumers must keep the three root-manifest entries above because Unity does not resolve transitive Git URLs from a package's semantic-version dependency entries.
+
 ## Unity Menu
 
+- Convention MonoBehaviour: `Assets > Create > Scripting > ActionFit Convention MonoBehaviour Script`.
 - README: `Tools > Package > AI Code Convention > README`.
 - If this package later owns or bootstraps a settings ScriptableObject, add `Setting SO` under the same package root.
+
+The convention template creates a new `MonoBehaviour` with example `Refs`, `Assets`, and `Settings` containers, private serialized backing fields, and getter-only access. Its `Refs.contentRoot` example uses `RequiredReference` plus exact-name `AutoWireChild`, its `Assets.iconSprite` example uses `RequiredReference` without hierarchy wiring, and `OnValidate` queues the owner through `ReferenceBindingRequests` only in the Editor. Unity owns the selected destination, rename interaction, `#SCRIPTNAME#` replacement, and root-namespace expansion.
+
+`com.actionfit.referencebinding@0.1.0` is a required dependency. The generated script compiles in Unity's predefined assemblies because the owner Runtime assembly is auto-referenced. A consuming custom asmdef must explicitly reference `com.actionfit.referencebinding`; the generator does not mutate project asmdefs. Invoking the menu does not select a profile, modify an existing script, save a Scene or Prefab, or prove that later edits remain compliant.
 
 ## AI Guide
 
@@ -25,6 +34,8 @@ This package remains a **Private** guidance package. It contains no Runtime asse
 - `portable-core` is the default profile. A consuming project's primary router may opt in with the exact selector `AI Code Convention profile: actionfit-unity`.
 - Never infer a profile from a repository name, organization, installed dependency, or folder layout.
 - Project-local safety and factual architecture remain authoritative context, and an installed package/API owner remains factual truth for its concrete surface.
+- The `actionfit-unity` profile separates Inspector-authored inputs into `Refs`, `Assets`, and `Settings`, exposes them through getter-only APIs, and keeps their stored values or reference identities unchanged during runtime.
+- The `actionfit-unity` profile prefers concrete ownership and permits a new interface only for an evidenced external contract, interchangeable production implementations, platform or runtime variants, or an unavoidable implementation-free assembly boundary. Existing interfaces are not automatic migration targets.
 - Detailed architecture and validation guidance is installed progressively with the related Agent Skills.
 
 The selected package profile can be the sole code-convention authority. A consuming project does not need a separate local convention document when its router selects the profile and its architecture documents contain only factual project mappings.
@@ -45,6 +56,6 @@ The comparison skill reports `Aligned`, `Local Extension`, `Conflict — Local W
 
 ## Safety
 
-- Serialized-reference work is routed to the installed `com.actionfit.referencebinding/AI_GUIDE.md`; this package does not reproduce its APIs or add asset-writing modes.
+- Serialized-reference behavior is routed to the required `com.actionfit.referencebinding/AI_GUIDE.md`; this package consumes its documented public attributes and owner queue without reproducing its APIs or adding asset-writing modes.
 - Package publication, repository creation, tags, and catalog registration are separate manual operations.
 - Public redistribution requires a separate ownership and distribution-rights review.
