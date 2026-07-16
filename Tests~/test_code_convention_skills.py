@@ -235,11 +235,11 @@ class CodeConventionSkillTests(unittest.TestCase):
 
     def test_package_is_editor_only_and_uses_published_required_dependencies(self) -> None:
         manifest = json.loads((PACKAGE_ROOT / "package.json").read_text(encoding="utf-8"))
-        self.assertEqual("0.3.2", manifest["version"])
+        self.assertEqual("0.3.3", manifest["version"])
         self.assertEqual(
             {
-                "com.actionfit.custompackagemanager": "1.1.84",
-                "com.actionfit.referencebinding": "0.1.0",
+                "com.actionfit.custompackagemanager": "1.1.91",
+                "com.actionfit.referencebinding": "0.1.1",
             },
             manifest["dependencies"],
         )
@@ -408,8 +408,8 @@ class CodeConventionSkillTests(unittest.TestCase):
         self.assertIn("do not install UniTask", profile)
         self.assertEqual(
             {
-                "com.actionfit.custompackagemanager": "1.1.84",
-                "com.actionfit.referencebinding": "0.1.0",
+                "com.actionfit.custompackagemanager": "1.1.91",
+                "com.actionfit.referencebinding": "0.1.1",
             },
             manifest["dependencies"],
         )
@@ -511,13 +511,13 @@ class CodeConventionSkillTests(unittest.TestCase):
 
         repository = "https://github.com/ActionFitGames/AI_Code_Convention.git"
         version = manifest["version"]
-        self.assertEqual("0.3.2", version)
+        self.assertEqual("0.3.3", version)
         self.assertIn(f"{repository}#{version}", readme)
         self.assertIn(repository, guide)
         self.assertIn(f"Current package version at generation time: `{version}`", guide)
         self.assertIn(f"This `{version}` candidate", guide)
-        self.assertIn(f"`{version}`", package_info)
-        self.assertIn("AFCC-INT-001", package_info)
+        self.assertIn("com.actionfit.custompackagemanager@1.1.91", package_info)
+        self.assertIn("com.actionfit.referencebinding@0.1.1", package_info)
         self.assertNotIn("`0.3.0`", package_info)
 
     def test_shell_wrapper_runs_the_python_contract_suite(self) -> None:

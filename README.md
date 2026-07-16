@@ -9,9 +9,9 @@ This package remains **Private**. It contains no Runtime assembly, EventBus impl
 ```json
 {
   "dependencies": {
-    "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.84",
-    "com.actionfit.referencebinding": "https://github.com/ActionFit-Editor/ReferenceBinding.git#0.1.0",
-    "com.actionfit.ai-codeconvention": "https://github.com/ActionFitGames/AI_Code_Convention.git#0.3.2"
+    "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.91",
+    "com.actionfit.referencebinding": "https://github.com/ActionFit-Editor/ReferenceBinding.git#0.1.1",
+    "com.actionfit.ai-codeconvention": "https://github.com/ActionFitGames/AI_Code_Convention.git#0.3.3"
   }
 }
 ```
@@ -26,7 +26,7 @@ Custom Package Manager resolves the two declared ActionFit dependencies when ins
 
 The convention template creates a new `MonoBehaviour` with example `Refs`, `Assets`, and `Settings` containers, private serialized backing fields, and getter-only access. Its `Refs.contentRoot` example uses `RequiredReference` plus exact-name `AutoWireChild`, its `Assets.iconSprite` example uses `RequiredReference` without hierarchy wiring, and `OnValidate` queues the owner through `ReferenceBindingRequests` only in the Editor. Unity owns the selected destination, rename interaction, `#SCRIPTNAME#` replacement, and root-namespace expansion.
 
-`com.actionfit.referencebinding@0.1.0` is a required dependency. The generated script compiles in Unity's predefined assemblies because the owner Runtime assembly is auto-referenced. A consuming custom asmdef must explicitly reference `com.actionfit.referencebinding`; the generator does not mutate project asmdefs. Invoking the menu does not select a profile, modify an existing script, save a Scene or Prefab, or prove that later edits remain compliant.
+`com.actionfit.referencebinding@0.1.1` is a required dependency. The generated script compiles in Unity's predefined assemblies because the owner Runtime assembly is auto-referenced. A consuming custom asmdef must explicitly reference `com.actionfit.referencebinding`; the generator does not mutate project asmdefs. Invoking the menu does not select a profile, modify an existing script, save a Scene or Prefab, or prove that later edits remain compliant.
 
 ## AI Guide
 
@@ -42,7 +42,7 @@ The selected package profile can be the sole code-convention authority. A consum
 
 ## Agent Skills
 
-Custom Package Manager `1.1.84` or newer installs the schema v2 skills into project-local agent folders while preserving modified or conflicting targets.
+Custom Package Manager `1.1.91` or newer installs the schema v2 skills into project-local agent folders while preserving modified or conflicting targets.
 
 - `$code-convention-help`: explains the selected profile, effective rule identifiers, owner routes, skills, and safety boundaries without changing state.
 - `$code-convention-check`: compares documented contracts, reports the effective profile-aware rule and local-convention retirement readiness, and proves the check did not change files.
