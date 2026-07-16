@@ -9,9 +9,9 @@ This package remains **Private**. It contains no Runtime assembly, EventBus impl
 ```json
 {
   "dependencies": {
-    "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.91",
+    "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.96",
     "com.actionfit.referencebinding": "https://github.com/ActionFit-Editor/ReferenceBinding.git#0.1.1",
-    "com.actionfit.ai-codeconvention": "https://github.com/ActionFitGames/AI_Code_Convention.git#0.4.0"
+    "com.actionfit.ai-codeconvention": "https://github.com/ActionFitGames/AI_Code_Convention.git#0.4.1"
   }
 }
 ```
@@ -44,7 +44,7 @@ The selected package profile can be the sole code-convention authority. A consum
 
 ## Agent Skills
 
-Custom Package Manager `1.1.91` or newer installs the schema v2 skills into project-local agent folders while preserving modified or conflicting targets.
+Custom Package Manager `1.1.96` or newer installs the schema v2 skills into project-local agent folders while preserving modified or conflicting targets.
 
 - `$code-convention-help`: explains the selected profile, effective rule identifiers, owner routes, skills, and safety boundaries without changing state.
 - `$code-convention-check`: compares documented contracts, reports the effective profile-aware rule and local-convention retirement readiness, and proves the check did not change files.

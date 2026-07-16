@@ -8,9 +8,9 @@ This file is the portable authority for generic Unity code-authoring rules distr
 - Display name: AI Code Convention
 - Repository: `https://github.com/ActionFitGames/AI_Code_Convention.git`
 - Repository visibility: Private
-- Current package version at generation time: `0.4.0`
+- Current package version at generation time: `0.4.1`
 - Unity version: `6000.2`
-- Custom Package Manager dependency: published `1.1.91`
+- Custom Package Manager dependency: published `1.1.96`
 - ReferenceBinding dependency: published `0.1.1`
 
 ## Purpose And Boundary
@@ -338,7 +338,7 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 ## Release And Distribution Boundary
 
-- This `0.4.0` candidate is Private because its design input does not include a public redistribution license notice.
+- This `0.4.1` candidate is Private because its design input does not include a public redistribution license notice.
 - A separate ownership and distribution-rights review is required before changing visibility or publishing publicly.
 - Publishing is manual through Custom Package Manager. Do not create a repository, push, tag, append a catalog row, deploy, or install into global/home skill directories without separate authorization.
 - Before any later release, re-check remote tags and align `package.json`, README, this guide, PackageInfo, and release notes.

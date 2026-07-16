@@ -1,12 +1,12 @@
 {
   "name": "com.actionfit.ai-codeconvention",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "displayName": "AI Code Convention",
   "description": "Portable Unity code-authoring rules with explicit profiles, tree-oriented package targets, API-owner routing, retirement checks, and authorized application.",
   "unity": "6000.2",
   "author": { "name": "ActionFit" },
   "dependencies": {
-    "com.actionfit.custompackagemanager": "1.1.91",
+    "com.actionfit.custompackagemanager": "1.1.96",
     "com.actionfit.referencebinding": "0.1.1"
   }
 }
