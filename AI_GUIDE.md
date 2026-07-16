@@ -8,7 +8,7 @@ This file is the portable authority for generic Unity code-authoring rules distr
 - Display name: AI Code Convention
 - Repository: `https://github.com/ActionFitGames/AI_Code_Convention.git`
 - Repository visibility: Private
-- Current package version at generation time: `0.3.3`
+- Current package version at generation time: `0.4.0`
 - Unity version: `6000.2`
 - Custom Package Manager dependency: published `1.1.91`
 - ReferenceBinding dependency: published `0.1.1`
@@ -187,6 +187,18 @@ This package requires `com.actionfit.referencebinding`. Read its installed `AI_G
 
 The following stable meanings are active only when `AFCC-PRO-001` selects `actionfit-unity`. Detailed selection examples and capability evidence live in `Skills~/Shared/references/profiles/actionfit-unity.md`.
 
+### `AFCC-TRE-001` — Compose ownership as a tree-oriented DAG
+
+Model the game's ownership and dependency direction as a tree-oriented view: one or more composition roots assemble coherent feature and service nodes, each node has one explicit lifecycle and state owner, and ordinary dependencies point from the composition owner toward the nodes it owns. The concrete dependency graph may be a directed acyclic graph because a reusable service can have multiple consumers; cycles remain prohibited. This rule describes ownership and dependency direction, not a required Unity Transform hierarchy, inheritance tree, class name, folder tree, or one-root runtime object graph. Apply it progressively to new or explicitly revised boundaries and do not remodel the whole project without separate authority.
+
+### `AFCC-PKG-001` — Package coherent reusable nodes behind one-way dependencies
+
+Treat a node as a package candidate only when project-neutral rules, state, lifecycle, and validation can be separated into a coherent capability with one-way dependencies. A reusable package assembly must not reference consuming-project types, scenes, prefabs, ScriptableObjects, save keys, asset IDs, or a concrete third-party SDK. Split engine, UI, and adapter packages only when observed ownership, replacement, compilation, or reuse boundaries justify the split; package count and maximum fragmentation are not goals. Preserve a project-owned composition layer for concrete bindings and migrations.
+
+### `AFCC-PRT-001` — Expose evidenced ports and bind project adapters at composition roots
+
+When a package genuinely requires an external capability, expose the narrowest consumer-oriented port that the package can own and bind the consuming project's adapter at a composition root. Keep project implementations, concrete SDKs, scene access, storage keys, and environment configuration outside the reusable package. Provide a neutral default only when its behavior is semantically safe and explicit. This rule does not override `AFCC-INT-001`: one hypothetical implementation, test convenience, dependency-injection registration, or naming symmetry does not justify a port. Do not add a dependency-injection container or service locator merely to perform the binding.
+
 ### `AFCC-ORG-001` — Organize classes by functional regions
 
 Use functional `#region` blocks for non-trivial ActionFit classes. Keep global fields and properties separate from feature-specific members. Use this order when a block exists: `Fields`, `Properties`, `Unity Lifecycle`, `Initialization`, `Public Methods`, `Private Methods`, `Event Handlers`. Do not add empty regions or reorganize untouched code solely for consistency.
@@ -302,7 +314,8 @@ Report changed files, ownership/state/communication decisions, validation perfor
 - The help skill is read-only and reads generated `PACKAGE_SKILLS.md` as the authoritative inventory.
 - The help skill resolves and reports the selected profile, effective stable IDs, capability gates, and installed owner routes.
 - The check skill is read-only. It compares documented rules, uses the six stable relationship categories, reports shadow or final retirement readiness, detects package-to-installed-skill drift, and proves repository state did not change.
-- The apply skill is write-capable but may be selected only after the user authorizes a concrete Unity code change. It works without local convention documents by reading the selected profile and installed owner guides. Project architecture supplies concrete facts, not an independent convention body. The skill does not create edit authority or own Jira, Git branches, worktrees, pull requests, publishing, or deployment.
+- The check skill does not inventory or judge every source file. Use the separately installed AI Refactor package when a user requests an evidence-backed source inventory and staged architecture proposal.
+- The apply skill is write-capable but may be selected only after the user authorizes a concrete Unity code change. It works without local convention documents by reading the selected profile and installed owner guides. Project architecture supplies concrete facts, not an independent convention body. The `AFCC-TRE-001`, `AFCC-PKG-001`, and `AFCC-PRT-001` target applies only inside separately authorized architecture or package scope with observed evidence. The skill does not create edit authority or own Jira, Git branches, worktrees, pull requests, publishing, or deployment.
 - `Skills~/Shared/references/unity-code-authoring-rules.md` contains progressive details for architecture, communication, persistence, lifecycle, assets, assemblies, anti-patterns, and validation.
 - `Skills~/Shared/references/profiles/actionfit-unity.md` contains the opt-in profile's activation, capability, examples, and validation detail.
 - `Skills~/Shared/references/owner-routing.md` resolves concrete Time, UI Foundation, and ReferenceBinding contracts through installed guides.
@@ -325,7 +338,7 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 ## Release And Distribution Boundary
 
-- This `0.3.3` candidate is Private because its design input does not include a public redistribution license notice.
+- This `0.4.0` candidate is Private because its design input does not include a public redistribution license notice.
 - A separate ownership and distribution-rights review is required before changing visibility or publishing publicly.
 - Publishing is manual through Custom Package Manager. Do not create a repository, push, tag, append a catalog row, deploy, or install into global/home skill directories without separate authorization.
 - Before any later release, re-check remote tags and align `package.json`, README, this guide, PackageInfo, and release notes.

@@ -6,12 +6,13 @@ Use this reference only after reading the consuming repository's instructions an
 
 1. [Rule selection](#rule-selection)
 2. [Architecture and state](#architecture-and-state)
-3. [Communication selection](#communication-selection)
-4. [Persistence and live economy](#persistence-and-live-economy)
-5. [Lifecycle, async, and static state](#lifecycle-async-and-static-state)
-6. [Assets, serialization, and assemblies](#assets-serialization-and-assemblies)
-7. [Anti-pattern review](#anti-pattern-review)
-8. [Validation matrix](#validation-matrix)
+3. [Tree-oriented package target](#tree-oriented-package-target)
+4. [Communication selection](#communication-selection)
+5. [Persistence and live economy](#persistence-and-live-economy)
+6. [Lifecycle, async, and static state](#lifecycle-async-and-static-state)
+7. [Assets, serialization, and assemblies](#assets-serialization-and-assemblies)
+8. [Anti-pattern review](#anti-pattern-review)
+9. [Validation matrix](#validation-matrix)
 
 ## Rule Selection
 
@@ -44,6 +45,16 @@ Adopt progressively:
 - MVP: explicit owner, direct calls, callbacks, matching cleanup, cancellation, Runtime/Editor separation.
 - Growth: add cross-boundary facts, read-only queries, asset providers, or asmdefs only after real coupling appears.
 - Advanced: registries, remote rollout, server validation, and finer assembly boundaries only when live operation or team scale requires them.
+
+## Tree-Oriented Package Target
+
+When the selected profile activates `AFCC-TRE-001`, begin with an ownership tree and enrich it into a directed acyclic dependency graph. Composition roots assemble feature and service nodes. Each node owns one coherent state and lifecycle boundary, while a shared lower-level node may serve more than one consumer. Cycles, child-to-root reach-through, and sibling implementation references indicate an ownership decision that still needs resolution.
+
+Apply `AFCC-PKG-001` only after direct source evidence shows a reusable, project-neutral capability. A package boundary must keep dependencies one-way and exclude project types, scene/prefab references, project-owned ScriptableObjects, save keys, asset IDs, and concrete SDKs. Engine/UI/adapter separation is useful only when those concerns have different reuse or ownership; smaller packages are not inherently better.
+
+Apply `AFCC-PRT-001` with `AFCC-INT-001`. A port represents a real external capability that a reusable node consumes. The package owns the narrow consumer-facing contract; a project composition root owns adapter selection and binding. One hypothetical implementation, test substitution alone, or a desire to add a DI container is not sufficient evidence. A neutral default must preserve semantics and must not turn missing required behavior into silent success.
+
+Architecture analysis and implementation remain separate authorities. A read-only analysis can propose target nodes, package candidates, ports, adapters, phases, and validation, but it cannot create edit, migration, package publication, or whole-project remodeling authority.
 
 ## Communication Selection
 
@@ -186,6 +197,10 @@ Flag these patterns before adding more of them:
 - public setters, mutation methods, or runtime assignments for profile-owned Inspector inputs that `AFCC-SER-004` requires to remain read-only;
 - persistence schema change without fixtures and recovery;
 - public API change mixed with unrelated refactoring.
+- package extraction proposed only because a folder or class can be made smaller;
+- a so-called tree that hides shared dependencies, cycles, lifetime ownership, or composition bindings;
+- project types, scenes, save keys, asset IDs, or concrete SDKs referenced from a reusable package assembly;
+- one interface per implementation, a DI container, or a service locator introduced to make package wiring uniform;
 - profile or optional-library behavior inferred without an exact selector and capability evidence;
 - a concrete package API selected without reading the installed owner guide;
 
@@ -207,6 +222,7 @@ Run the smallest evidence that can prove the changed contract, then add risk-spe
 | Static/event hub | re-entry and cleanup | domain reload disabled when supported |
 | Live/remote data | default, range, failure fallback | rollout, kill switch, rollback, server compatibility |
 | Profile or owner route | exact selector, capability and installed guide | negative fixture without the optional capability |
+| Tree/package/port target | owner and edge map, cycle check, project-coupling evidence, qualifying port evidence | phased migration and project-adapter compatibility plan |
 | Convention retirement | shadow mapping, stale-link and skill-drift audit | package-only rerun after approved deletion |
 
 For every check, record the exact scope and distinguish package failures, project regressions, known issues, environment failures, and unverified manual behavior.

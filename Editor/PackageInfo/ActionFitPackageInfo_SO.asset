@@ -18,12 +18,16 @@ MonoBehaviour:
   _repositoryVisibility: 1
   _owner: ActionFit
   _status: candidate
-  _description: Portable Unity code-authoring rules with explicit profiles, API-owner
-    routing, retirement checks, and authorized application.
-  _releaseNote: "- \uD544\uC218 \uC758\uC874\uC131\uC744 `com.actionfit.custompackagemanager@1.1.91`\uACFC
-    `com.actionfit.referencebinding@0.1.1`\uB85C \uAC31\uC2E0\uD588\uC2B5\uB2C8\uB2E4.\n-
-    README, `AI_GUIDE.md`, package contract test\uC758 \uBC84\uC804 \uAE30\uB300\uAC12\uC744
-    \uC0C8 \uC758\uC874\uC131 \uACC4\uC57D\uC5D0 \uB9DE\uCDC4\uC2B5\uB2C8\uB2E4.\n-
-    portable/profile \uADDC\uCE59\uACFC MonoBehaviour starter \uC0DD\uC131 \uB3D9\uC791\uC740
-    \uBCC0\uACBD\uD558\uC9C0 \uC54A\uC558\uC2B5\uB2C8\uB2E4."
-  _dependenciesOverride: 
+  _description: Portable Unity code-authoring rules with explicit profiles, tree-oriented
+    package targets, API-owner routing, retirement checks, and authorized application.
+  _releaseNote: "- `AFCC-TRE-001`\uB85C \uAC8C\uC784 \uC18C\uC720\uAD8C\uC744 tree-oriented
+    DAG\uB85C \uAD6C\uC131\uD558\uB294 \uBAA9\uD45C\uB97C \uCD94\uAC00\uD588\uC2B5\uB2C8\uB2E4.\n-
+    `AFCC-PKG-001`\uB85C \uD504\uB85C\uC81D\uD2B8 \uC911\uB9BD\uC801\uC778 \uB2E8\uC704\uB97C
+    \uB2E8\uBC29\uD5A5 \uC758\uC874 \uD328\uD0A4\uC9C0 \uD6C4\uBCF4\uB85C \uBD84\uB9AC\uD558\uB294
+    \uAE30\uC900\uC744 \uCD94\uAC00\uD588\uC2B5\uB2C8\uB2E4.\n- `AFCC-PRT-001`\uB85C
+    \uAC80\uC99D\uB41C \uC678\uBD80 \uAE30\uB2A5\uB9CC \uC881\uC740 port\uB85C \uB178\uCD9C\uD558\uACE0
+    composition root\uC5D0\uC11C project adapter\uB97C \uC5F0\uACB0\uD558\uB3C4\uB85D
+    \uC815\uC758\uD588\uC2B5\uB2C8\uB2E4.\n- AI Refactor\uC758 source-wide \uC81C\uC548
+    \uC5ED\uD560\uACFC CodeConvention\uC758 \uADDC\uCE59 \uC18C\uC720 \uC5ED\uD560\uC744
+    \uBD84\uB9AC\uD588\uC2B5\uB2C8\uB2E4."
+  _dependenciesOverride: com.actionfit.custompackagemanager@1.1.91;com.actionfit.referencebinding@0.1.1

@@ -52,6 +52,9 @@ PROFILE_RULE_IDS = (
     "AFCC-PRO-001",
     "AFCC-PRO-002",
     "AFCC-STY-001",
+    "AFCC-TRE-001",
+    "AFCC-PKG-001",
+    "AFCC-PRT-001",
     "AFCC-ORG-001",
     "AFCC-CMT-001",
     "AFCC-LOG-001",
@@ -235,7 +238,7 @@ class CodeConventionSkillTests(unittest.TestCase):
 
     def test_package_is_editor_only_and_uses_published_required_dependencies(self) -> None:
         manifest = json.loads((PACKAGE_ROOT / "package.json").read_text(encoding="utf-8"))
-        self.assertEqual("0.3.3", manifest["version"])
+        self.assertEqual("0.4.0", manifest["version"])
         self.assertEqual(
             {
                 "com.actionfit.custompackagemanager": "1.1.91",
@@ -463,6 +466,40 @@ class CodeConventionSkillTests(unittest.TestCase):
         self.assertIn("prefers concrete ownership", readme)
         self.assertIn("Existing interfaces are not automatic migration targets", readme)
 
+    def test_actionfit_target_is_tree_oriented_package_neutral_and_port_guarded(self) -> None:
+        guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
+        profile = PROFILE_REFERENCE.read_text(encoding="utf-8")
+        shared = SHARED_REFERENCE.read_text(encoding="utf-8")
+        readme = (PACKAGE_ROOT / "README.md").read_text(encoding="utf-8")
+        combined = "\n".join((guide, profile, shared, readme))
+
+        for rule_id in ("AFCC-TRE-001", "AFCC-PKG-001", "AFCC-PRT-001"):
+            self.assertIn(rule_id, guide)
+            self.assertIn(rule_id, profile)
+        for phrase in (
+            "tree-oriented",
+            "directed acyclic",
+            "composition root",
+            "project-neutral",
+            "concrete SDK",
+            "narrow",
+            "project adapters",
+            "package count",
+            "service locator",
+            "whole-project remodeling",
+        ):
+            self.assertIn(phrase, combined)
+        self.assertIn("one hypothetical implementation", combined)
+        self.assertIn("does not inventory or judge every source file", guide)
+
+        for agent in ("Codex", "Claude"):
+            help_skill = self._read_skill(agent, "code-convention-help")
+            check_skill = self._read_skill(agent, "code-convention-check")
+            apply_skill = self._read_skill(agent, "code-convention-apply")
+            self.assertIn("`$refactor-plan`", help_skill)
+            self.assertIn("Do not infer source violations", check_skill)
+            self.assertIn("Do not treat an AI Refactor proposal as edit authority", apply_skill)
+
     def test_owner_routes_use_installed_guides_without_inventing_apis(self) -> None:
         routing = OWNER_ROUTING_REFERENCE.read_text(encoding="utf-8")
 
@@ -511,7 +548,7 @@ class CodeConventionSkillTests(unittest.TestCase):
 
         repository = "https://github.com/ActionFitGames/AI_Code_Convention.git"
         version = manifest["version"]
-        self.assertEqual("0.3.3", version)
+        self.assertEqual("0.4.0", version)
         self.assertIn(f"{repository}#{version}", readme)
         self.assertIn(repository, guide)
         self.assertIn(f"Current package version at generation time: `{version}`", guide)

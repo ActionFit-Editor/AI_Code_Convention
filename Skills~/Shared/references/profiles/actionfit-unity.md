@@ -74,6 +74,34 @@ Apply `AFCC-INT-001` progressively to new or deliberately revised contracts:
 
 Testing convenience does not independently justify an interface. A test seam qualifies only when the same boundary is a real production adapter or owner contract, such as a platform implementation or an external nondeterministic dependency with explicit ownership.
 
+### Tree-oriented ownership and package boundaries
+
+Apply `AFCC-TRE-001`, `AFCC-PKG-001`, and `AFCC-PRT-001` together when a user asks for architecture or package planning:
+
+- Draw an ownership tree first: composition root, feature or service node, child owners, and each node's state and lifetime owner. Then record shared dependencies as additional directed edges. The result is a tree-oriented DAG, not a promise that every runtime reference has exactly one parent.
+- Reject cycles. A lower node never reaches back into its composition root or a sibling implementation. Report upward through an existing callback, event, result, or a separately evidenced consumer contract.
+- Keep composition roots project-owned. They select concrete project adapters, scene objects, SDK implementations, save keys, environment settings, and package-neutral defaults.
+- A package candidate owns one coherent rule/state/lifecycle unit. It can depend on lower reusable packages, but it cannot reference a consuming-project assembly, scene, prefab, project ScriptableObject, concrete SDK, save key, or asset identifier.
+- Split a reusable node into engine, UI, and adapter packages only when concrete evidence shows distinct reuse, replacement, compilation, platform, or ownership boundaries. A three-package shape is an available decomposition, not a quota.
+- Add a port only for a capability the package actually consumes and cannot own. Keep the port narrow and consumer-oriented, bind it once at the composition root, and cache the selected adapter at the ownership boundary.
+- A safe neutral default is allowed only when it preserves the declared semantics. Silent success, fabricated data, or a no-op that hides a required capability is not a neutral default.
+- Do not introduce a dependency-injection container, service locator, global registry, generic base node, or one-interface-per-class pattern to make the diagram appear uniform.
+
+Example target view:
+
+```text
+Project Composition Root
+├── Feature A package
+│   └── Shared service package
+├── Feature B package
+│   └── Shared service package
+└── Project adapters
+    ├── SDK adapter -> narrow package port
+    └── Scene adapter -> narrow package port
+```
+
+The repeated shared-service line represents two incoming consumer edges to one owned service node. It does not authorize duplicate service instances or a dependency cycle. Record the selected lifetime and instancing decision separately.
+
 ### Async, duration, and periodic work
 
 When UniTask evidence exists:
@@ -167,4 +195,5 @@ An auto-killed field and `IsActive()` do not prove ownership. Target-wide kill i
 - For serialized changes, inspect every targeted asset diff and verify reload without value loss.
 - For DOTween changes, exercise replay, disable/destroy cleanup, and another animation sharing the same target.
 - For a new interface, identify the qualifying production evidence and inspect its implementations and consumers; confirm that an existing interface was not migrated without separate authority.
+- For a package-tree proposal, identify each node owner, all dependency edges and cycles, project-only coupling, the production evidence for each port, and why each package split is coherent rather than merely smaller.
 - Run a negative check showing that absent capabilities did not gain dependencies, symbols, or unavailable API calls.

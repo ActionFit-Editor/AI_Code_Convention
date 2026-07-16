@@ -11,7 +11,7 @@ This package remains **Private**. It contains no Runtime assembly, EventBus impl
   "dependencies": {
     "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.91",
     "com.actionfit.referencebinding": "https://github.com/ActionFit-Editor/ReferenceBinding.git#0.1.1",
-    "com.actionfit.ai-codeconvention": "https://github.com/ActionFitGames/AI_Code_Convention.git#0.3.3"
+    "com.actionfit.ai-codeconvention": "https://github.com/ActionFitGames/AI_Code_Convention.git#0.4.0"
   }
 }
 ```
@@ -36,6 +36,8 @@ The convention template creates a new `MonoBehaviour` with example `Refs`, `Asse
 - Project-local safety and factual architecture remain authoritative context, and an installed package/API owner remains factual truth for its concrete surface.
 - The `actionfit-unity` profile separates Inspector-authored inputs into `Refs`, `Assets`, and `Settings`, exposes them through getter-only APIs, and keeps their stored values or reference identities unchanged during runtime.
 - The `actionfit-unity` profile prefers concrete ownership and permits a new interface only for an evidenced external contract, interchangeable production implementations, platform or runtime variants, or an unavoidable implementation-free assembly boundary. Existing interfaces are not automatic migration targets.
+- The `actionfit-unity` profile targets a tree-oriented ownership view whose concrete dependency graph is an acyclic DAG: composition roots assemble coherent feature or service nodes, reusable nodes can become project-neutral packages, and only evidenced external capabilities become narrow ports bound to project adapters at a composition root.
+- The target is progressive. Package count, strict tree-shaped runtime references, speculative interfaces, dependency-injection containers, and whole-project remodeling are not goals.
 - Detailed architecture and validation guidance is installed progressively with the related Agent Skills.
 
 The selected package profile can be the sole code-convention authority. A consuming project does not need a separate local convention document when its router selects the profile and its architecture documents contain only factual project mappings.
