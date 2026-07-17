@@ -20,5 +20,16 @@ MonoBehaviour:
   _status: candidate
   _description: Portable Unity code-authoring rules with explicit profiles, tree-oriented
     package targets, API-owner routing, retirement checks, and authorized application.
-  _releaseNote: "- 저장소 대상을 Public `ActionFit-Editor/AI_Code_Convention`으로 전환해 별도 Private 접근 권한 없이 패키지를 설치할 수 있도록 준비했습니다.\n- Custom Package Manager 의존성을 `1.1.97`로 갱신해 Public-default 저장소 정책과 동일한 생성·배포 계약을 사용합니다.\n- README와 AI 가이드의 설치 URL, visibility, 버전 정보를 `0.4.2` 공개 배포 후보와 일치시켰습니다.\n- 기존 AFCC 규칙 ID, Editor API, 직렬화 계약과 ReferenceBinding `0.1.1` 의존성은 변경하지 않았습니다."
-  _dependenciesOverride: com.actionfit.custompackagemanager@1.1.97;com.actionfit.referencebinding@0.1.1
+  _releaseNote: "- \uAD6C\uCCB4\uC801\uC778 \uC81C\uD488 \uAD6C\uC131\uC744 \uC81C\uD488
+    \uC18C\uC720\uC758 \uBE44\uC7AC\uC0AC\uC6A9 \uD328\uD0A4\uC9C0\uB85C \uBA85\uC2DC\uD558\uB294
+    AFCC-PCR-001 \uADDC\uCE59\uC744 \uCD94\uAC00\uD588\uC2B5\uB2C8\uB2E4.\n- Package
+    Identity \uC548\uC758 AI Product Composition Root\uC640 AI Refactor target \uB450
+    marker, package.json name \uC77C\uCE58, \uB2E8\uC77C root \uACC4\uC57D\uC744
+    \uBA85\uC2DC\uD588\uC2B5\uB2C8\uB2E4.\n- \uC81C\uD488 \uAD6C\uC131 marker\uAC00
+    actionfit-unity \uD504\uB85C\uD544\uC744 \uC790\uB3D9 \uC120\uD0DD\uD558\uC9C0
+    \uC54A\uACE0 \uB9C8\uC774\uADF8\uB808\uC774\uC158 \uAD8C\uD55C\uB3C4 \uB9CC\uB4E4\uC9C0
+    \uC54A\uB3C4\uB85D \uACBD\uACC4\uB97C \uBCF4\uAC15\uD588\uC2B5\uB2C8\uB2E4.\n-
+    Codex\uC640 Claude\uC758 help/check/apply \uC6D0\uBCF8, \uACF5\uC720 reference,
+    README, metadata, \uD68C\uADC0 \uD14C\uC2A4\uD2B8\uB97C \uB3D9\uC77C \uACC4\uC57D\uC73C\uB85C
+    \uAC31\uC2E0\uD588\uC2B5\uB2C8\uB2E4."
+  _dependenciesOverride: com.actionfit.custompackagemanager@1.1.100;com.actionfit.referencebinding@0.1.2

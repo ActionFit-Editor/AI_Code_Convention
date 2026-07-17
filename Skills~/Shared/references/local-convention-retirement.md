@@ -8,13 +8,15 @@ Count a document as local code-convention authority when it normatively tells co
 
 Do not count these as local code-convention authority:
 
-- the exact profile selector and package route;
+- the exact profile selector, package route, and a valid product package's exact product-composition declaration;
 - repository safety, approval, workflow, branch, validation, or release rules;
 - factual architecture that records current concrete types, paths, owners, keys, public surfaces, sequences, or compatibility history;
 - content-specific business and persistence contracts;
 - installed API-owner guides.
 
 If a factual document also restates a general coding rule, classify only that normative wording and recommend replacing it with the governing `AFCC-*` ID while retaining the facts.
+
+A package-owned product-composition declaration is routing metadata only when it satisfies `AFCC-PCR-001` in the resolved product package's `## Package Identity`. A duplicated marker in project documentation is not a second valid declaration. Product-specific facts in an installed product guide may remain owner evidence, but any generic code-authoring rule restated there still requires normal comparison and retirement classification.
 
 ## Shadow Gates
 

@@ -24,12 +24,12 @@ public class GeneratedConventionProbe : MonoBehaviour
 
     #region Unity Lifecycle
 
+#if UNITY_EDITOR
     private void OnValidate()
     {
-#if UNITY_EDITOR
         ReferenceBindingRequests.Enqueue(this);
-#endif
     }
+#endif
 
     #endregion
 

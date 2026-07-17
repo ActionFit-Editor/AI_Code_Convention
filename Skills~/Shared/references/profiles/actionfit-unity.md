@@ -57,7 +57,7 @@ if (target == null)
 
 ### Conditional compilation and discovery
 
-- `AFCC-CPP-001`: keep the method declaration stable and place symbol-specific behavior inside the body. Conditional imports and declarations requiring an unavailable base type remain valid exceptions.
+- `AFCC-CPP-001`: keep the method declaration stable when only behavior varies by symbol. Guard the complete declaration when the callback contract itself is Editor/platform-only or cannot compile outside that target; wrap the complete Unity `OnValidate` method in `#if UNITY_EDITOR`.
 - `AFCC-PRF-001`: prefer existing serialized/injected references, owner access, or cached hierarchy discovery. Runtime scene-wide discovery is not a fallback for unclear ownership; Editor-only inspection may use it with explicit scope.
 - `AFCC-EAR-001`: keep movable Editor asset and folder selections relocatable through a serialized reference, GUID-backed lookup, or evidenced project finder. Validate missing and ambiguous results instead of silently binding the first arbitrary match.
 
@@ -76,16 +76,26 @@ Testing convenience does not independently justify an interface. A test seam qua
 
 ### Tree-oriented ownership and package boundaries
 
-Apply `AFCC-TRE-001`, `AFCC-PKG-001`, and `AFCC-PRT-001` together when a user asks for architecture or package planning:
+Apply `AFCC-TRE-001`, `AFCC-PKG-001`, `AFCC-PCR-001`, `AFCC-PRT-001`, `AFCC-BND-001`, `AFCC-ANI-001`, and `AFCC-PKG-002` together when a user asks for the corresponding architecture or package boundaries:
 
 - Draw an ownership tree first: composition root, feature or service node, child owners, and each node's state and lifetime owner. Then record shared dependencies as additional directed edges. The result is a tree-oriented DAG, not a promise that every runtime reference has exactly one parent.
 - Reject cycles. A lower node never reaches back into its composition root or a sibling implementation. Report upward through an existing callback, event, result, or a separately evidenced consumer contract.
 - Keep composition roots project-owned. They select concrete project adapters, scene objects, SDK implementations, save keys, environment settings, and package-neutral defaults.
+- A project-owned composition layer may physically live in one product-owned, non-reusable package. Opt in only when the package root `AI_GUIDE.md` contains the exact complete trimmed markers `AI Product Composition Root: <package-id>` and `AI Refactor target: package-oriented-product` inside `## Package Identity`, and the actual root ID matches the sibling `package.json` `name`. The pair selects only this product-composition target; it does not select `actionfit-unity` or make the package reusable.
+- After normal embedded-before-PackageCache resolution, accept at most one declared product root. Treat an absent declaration as the normal generic architecture target. Report an incomplete pair, duplicate declaration, package-ID mismatch, declaration outside `Package Identity`, or unsupported target as missing evidence or a structural diagnostic; never infer intent from installation, dependency names, repository identity, folders, or source style.
 - A package candidate owns one coherent rule/state/lifecycle unit. It can depend on lower reusable packages, but it cannot reference a consuming-project assembly, scene, prefab, project ScriptableObject, concrete SDK, save key, or asset identifier.
 - Split a reusable node into engine, UI, and adapter packages only when concrete evidence shows distinct reuse, replacement, compilation, platform, or ownership boundaries. A three-package shape is an available decomposition, not a quota.
 - Add a port only for a capability the package actually consumes and cannot own. Keep the port narrow and consumer-oriented, bind it once at the composition root, and cache the selected adapter at the ownership boundary.
 - A safe neutral default is allowed only when it preserves the declared semantics. Silent success, fabricated data, or a no-op that hides a required capability is not a neutral default.
 - Do not introduce a dependency-injection container, service locator, global registry, generic base node, or one-interface-per-class pattern to make the diagram appear uniform.
+
+The product package may own concrete product bindings, dependency selection, and migration targets. Reusable dependencies still obey `AFCC-PKG-001`; project safety, workflow, current-state, compatibility, and migration facts remain local until another explicit owner can preserve them. A declaration does not authorize package creation, code or asset migration, project-document deletion, publication, or deployment.
+
+For new or deliberately revised scene presentation, the `MonoBehaviour` is a thin binder and sole owner of serialized `Refs`, `Assets`, and `Settings`. It initializes and explicitly calls a plain C# feature owner instead of containing reusable state transitions. The binder may own Unity lifecycle and subscriptions, but children do not reach back into the binder and the binder does not locate project services through scene-wide discovery or a service locator.
+
+Keep reusable animation helpers non-serialized. Their entry points receive the exact targets, settings, and cancellation/lifetime context from the binder. They may retain only runtime handles they create and clean up. Apply `AFCC-TWN-001` as an additional capability rule when DOTween is evidenced.
+
+Use dependency-specific Leaf packages only where the axis can compile, test, version, and evolve independently. Origin/Core points inward to no optional UI, DOTween, SDK, or project assembly. Unity Binding, UI Foundation Binding, DOTween Animation, SDK Adapter, and Installer packages may depend inward on lower nodes. A default bundle may install all supported leaves while direct consumers choose a smaller declared closure. Do not turn this list into a package-count quota.
 
 Example target view:
 
@@ -165,7 +175,7 @@ public Settings Configuration => settings;
 
 Do not add setters or runtime mutation methods. The serialized inputs may be established by declaration defaults, Unity deserialization, or Editor-only authoring before Play Mode. Once runtime begins, do not replace the containers or assign their fields. Copy any value that must change into a separately owned runtime model. Returning a Component or asset does not freeze that referenced object's internal state; only the stored reference identity remains fixed.
 
-`com.actionfit.referencebinding` is a required dependency of this package rather than an optional capability gate. Use `RequiredReference` on mandatory `Refs` fields and add `AutoWireChild` only when the Component type plus exact root-or-descendant GameObject name defines one unique hierarchy candidate. `Assets` may use `RequiredReference` for mandatory references but never `AutoWireChild`; ReferenceBinding does not search the AssetDatabase or prove that a reference is persistent. Keep `ReferenceBindingRequests.Enqueue(this)` inside the owner MonoBehaviour's searchable `OnValidate` body under `#if UNITY_EDITOR`. A custom consuming asmdef must explicitly reference `com.actionfit.referencebinding`; package installation does not rewrite asmdefs. Editor-only attributes and tools may author private fields before Play Mode, but the installed owner must reject Player and Play-Mode mutation paths.
+`com.actionfit.referencebinding` is a required dependency of this package rather than an optional capability gate. Use `RequiredReference` on mandatory `Refs` fields and add `AutoWireChild` only when the Component type plus exact root-or-descendant GameObject name defines one unique hierarchy candidate. `Assets` may use `RequiredReference` for mandatory references but never `AutoWireChild`; ReferenceBinding does not search the AssetDatabase or prove that a reference is persistent. Wrap the owner MonoBehaviour's complete `OnValidate` declaration and `ReferenceBindingRequests.Enqueue(this)` call in `#if UNITY_EDITOR`. A custom consuming asmdef must explicitly reference `com.actionfit.referencebinding`; package installation does not rewrite asmdefs. Editor-only attributes and tools may author private fields before Play Mode, but the installed owner must reject Player and Play-Mode mutation paths.
 
 A standalone serialized field remains valid when a container would obscure ownership. Resolve concrete component wrappers and reference-binding shapes through `references/owner-routing.md` rather than copying types from another consuming project. Moving an existing field between containers changes its serialized property path, so apply the new shape progressively and use the approved serialization migration contract for existing assets.
 
@@ -196,4 +206,7 @@ An auto-killed field and `IsActive()` do not prove ownership. Target-wide kill i
 - For DOTween changes, exercise replay, disable/destroy cleanup, and another animation sharing the same target.
 - For a new interface, identify the qualifying production evidence and inspect its implementations and consumers; confirm that an existing interface was not migrated without separate authority.
 - For a package-tree proposal, identify each node owner, all dependency edges and cycles, project-only coupling, the production evidence for each port, and why each package split is coherent rather than merely smaller.
+- For a product-root proposal, verify the exact marker pair in `Package Identity`, the sibling manifest name, unique resolved ownership, separate profile selector, and the absence of an inferred or duplicated local declaration.
+- For a binder boundary, verify that serialized scene inputs have one owner, plain logic has no Unity serialization dependency, and animation entry points receive their targets explicitly.
+- For Leaf packages, compile Origin/Core without optional integration assemblies and compile each leaf against only its declared inward dependencies.
 - Run a negative check showing that absent capabilities did not gain dependencies, symbols, or unavailable API calls.

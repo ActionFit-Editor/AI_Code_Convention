@@ -8,10 +8,10 @@ This file is the portable authority for generic Unity code-authoring rules distr
 - Display name: AI Code Convention
 - Repository: `https://github.com/ActionFit-Editor/AI_Code_Convention.git`
 - Repository visibility: Public
-- Current package version at generation time: `0.4.2`
+- Current package version at generation time: `0.4.4`
 - Unity version: `6000.2`
-- Custom Package Manager dependency: published `1.1.97`
-- ReferenceBinding dependency: published `0.1.1`
+- Custom Package Manager dependency: release candidate `1.1.100`
+- ReferenceBinding dependency: published `0.1.2`
 
 ## Purpose And Boundary
 
@@ -27,8 +27,8 @@ The package does not prove that existing source code complies with its guidance.
 - The template uses Unity's `#SCRIPTNAME#`, `#ROOTNAMESPACEBEGIN#`, and `#ROOTNAMESPACEEND#` tokens. Unity owns destination selection, rename interaction, class-name replacement, root-namespace expansion, and existing-file handling.
 - The generated starter contains example `Refs`, `Assets`, and `Settings` containers under `AFCC-RFS-002`, private `[SerializeField]` backing fields and getter-only access under `AFCC-SER-004`, and no empty lifecycle methods.
 - `Refs.contentRoot` uses `RequiredReference("CONTENT_ROOT_MISSING")` and `AutoWireChild("ContentRoot")`. The exact GameObject name is the AutoWire search key, while the Required string is a diagnostic identifier. `Assets.iconSprite` uses `RequiredReference("ICON_SPRITE_MISSING")` without `AutoWireChild`; `Settings` has no reference attributes.
-- The searchable `OnValidate` declaration keeps `ReferenceBindingRequests.Enqueue(this)` inside `#if UNITY_EDITOR`. It enqueues the owning `MonoBehaviour`, never a nested container, and does not reference `ReferenceBinding.Editor` from generated runtime code.
-- `com.actionfit.referencebinding@0.1.1` is a required package dependency and owns attribute, processing, validation, Play Mode, Dirty-state, and save behavior. The generator never saves a Scene or Prefab. It also never replaces a valid manual reference or defines a second reference-processing API.
+- The complete `OnValidate` declaration is wrapped in `#if UNITY_EDITOR`. Editor compilation still enqueues the owning `MonoBehaviour`, never a nested container, while Player compilation emits neither the method nor the Editor-only request type.
+- `com.actionfit.referencebinding@0.1.2` is a required package dependency and owns attribute, processing, validation, Play Mode, Dirty-state, and save behavior. The generator never saves a Scene or Prefab. It also never replaces a valid manual reference or defines a second reference-processing API.
 - The generated output compiles in Unity predefined assemblies through ReferenceBinding's auto-referenced Runtime assembly. A consuming custom asmdef must explicitly reference `com.actionfit.referencebinding`; package installation alone does not add that assembly reference, and this generator does not mutate consuming asmdefs.
 - Invoking this menu is an explicit request for the `actionfit-unity` starter shape. It does not read or write the repository's profile selector, infer a profile, create or change an asmdef, overwrite or migrate existing scripts, or enforce runtime immutability mechanically.
 - The generated file is user-owned after creation. Replace the example fields with feature-specific inputs while preserving the selected effective rules. Package updates never rewrite generated scripts, and the starter alone is not source-compliance proof.
@@ -195,9 +195,29 @@ Model the game's ownership and dependency direction as a tree-oriented view: one
 
 Treat a node as a package candidate only when project-neutral rules, state, lifecycle, and validation can be separated into a coherent capability with one-way dependencies. A reusable package assembly must not reference consuming-project types, scenes, prefabs, ScriptableObjects, save keys, asset IDs, or a concrete third-party SDK. Split engine, UI, and adapter packages only when observed ownership, replacement, compilation, or reuse boundaries justify the split; package count and maximum fragmentation are not goals. Preserve a project-owned composition layer for concrete bindings and migrations.
 
+### `AFCC-PCR-001` — Declare package-owned product composition explicitly
+
+An ActionFit product may keep its concrete composition layer in exactly one product-owned, non-reusable package. Opt in only when that package's root `AI_GUIDE.md` contains exactly one complete trimmed `AI Product Composition Root: <package-id>` line and exactly one complete trimmed `AI Refactor target: package-oriented-product` line inside its `## Package Identity` section. The actual product-root value must exactly match the sibling `package.json` `name`. After normal embedded-before-PackageCache resolution, exactly one product package may declare the root.
+
+The marker pair selects only the package-oriented product-composition target. It does not select `actionfit-unity`; the consuming repository still requires the separate exact primary-router selector from `AFCC-PRO-001`. Absence of both markers retains the generic architecture target. Do not infer product composition from package presence, repository identity, dependency names, folders, or source style. Treat an incomplete pair, duplicates, a package-ID mismatch, a declaration outside `Package Identity`, or an unsupported target as missing evidence or a structural diagnostic rather than guessing.
+
+The product package may own concrete product bindings, dependency selection, and migration targets without becoming a reusable package. Reusable dependencies remain project-neutral under `AFCC-PKG-001`, while project safety, workflow, current-state, compatibility, and migration facts remain local until another explicit owner can preserve them. The declaration creates no authority to create a package, migrate code or assets, delete project documents, edit the repository, publish, or deploy.
+
 ### `AFCC-PRT-001` — Expose evidenced ports and bind project adapters at composition roots
 
 When a package genuinely requires an external capability, expose the narrowest consumer-oriented port that the package can own and bind the consuming project's adapter at a composition root. Keep project implementations, concrete SDKs, scene access, storage keys, and environment configuration outside the reusable package. Provide a neutral default only when its behavior is semantically safe and explicit. This rule does not override `AFCC-INT-001`: one hypothetical implementation, test convenience, dependency-injection registration, or naming symmetry does not justify a port. Do not add a dependency-injection container or service locator merely to perform the binding.
+
+### `AFCC-BND-001` — Keep MonoBehaviours as thin serialized binders
+
+For new or deliberately revised presentation and scene integration, keep a `MonoBehaviour` focused on Unity lifecycle, serialized `Refs`/`Assets`/`Settings`, event subscription, and explicit calls into feature logic. The binder is the sole serialization owner for those scene inputs. Put reusable state transitions and deterministic behavior in plain C# owners initialized with the smallest required values or references. Do not duplicate feature rules in the binder, let a child reach into its parent, discover scene-wide dependencies, or introduce a DI container or service locator merely to connect the two layers. Existing components are progressive migration candidates, not automatic rewrite targets.
+
+### `AFCC-ANI-001` — Pass animation targets at the call boundary
+
+Keep reusable animation helpers free of serialized scene-object fields. Each animation entry point receives the exact `Component`, `Transform`, `GameObject`, values, duration/settings, and cancellation or lifetime context it operates on; the binder passes its already owned targets explicitly. An animation object may retain only runtime handles that it created and must clean them up at its documented lifetime. This rule does not require a stateless implementation and does not replace capability-specific ownership such as `AFCC-TWN-001`.
+
+### `AFCC-PKG-002` — Split optional dependency axes into coherent Leaf packages
+
+Keep an Origin/Core package free of consuming-project assemblies and optional UI, animation, SDK, and binding frameworks. When concrete reuse or replacement evidence exists, place Unity binding, UI Foundation binding, DOTween animation, concrete SDK adapters, and installer/bootstrap behavior in inward-dependent Leaf packages so a consumer can embed or replace one axis without importing unrelated dependencies. A default installer may select the complete supported set, but direct consumers may install a smaller declared closure. Do not create one package per class, hide a dependency cycle, or split modules that cannot compile, test, version, and evolve coherently.
 
 ### `AFCC-ORG-001` — Organize classes by functional regions
 
@@ -217,7 +237,7 @@ Before returning from a null, range, state, or other defensive guard that should
 
 ### `AFCC-CPP-001` — Preserve method discoverability across compilation symbols
 
-Keep a method declaration searchable and put conditional compilation inside its body when the behavior varies by symbol. Conditional `using` directives and declarations that cannot compile without a platform-specific base type are exceptions. Do not duplicate whole method declarations across symbol branches when one stable declaration can contain the branch.
+Keep a method declaration searchable and put conditional compilation inside its body when only the behavior varies by symbol. Guard the complete declaration when the method or callback contract itself is Editor/platform-only, or when its signature cannot compile or has no meaning outside that target. In particular, wrap the complete Unity `OnValidate` declaration in `#if UNITY_EDITOR`; do not leave an empty Player method merely for discoverability. Conditional `using` directives and declarations requiring an unavailable base type remain valid exceptions. Do not duplicate whole method declarations across symbol branches when one stable declaration can contain the branch.
 
 ### `AFCC-PRF-001` — Avoid scene-wide discovery in runtime paths
 
@@ -296,7 +316,7 @@ Retirement readiness is reported separately from these six categories. Read `Ski
 
 Reusable organization choices may live in an explicitly selected package profile. Concrete project types, loop event names, clock facades, storage paths, popup interfaces, service adapters, asset keys, and current runtime ownership remain factual project architecture or installed API-owner guidance. Do not copy those project-only identifiers into portable core or an organization profile.
 
-A consuming project may operate with no local code-convention documents. Its primary router may contain only the package authority pointer and exact profile selector, while project safety, workflow, and factual architecture stay local for their separate responsibilities. If local convention documents remain during migration, compare them through the normal precedence and retirement contracts until removal is explicitly authorized.
+A consuming project may operate with no local code-convention documents. Its primary router may contain only the package authority pointer and exact profile selector, while a valid package-owned product-composition declaration remains routing metadata and project safety, workflow, and factual architecture stay local for their separate responsibilities. If local convention documents remain during migration, compare them through the normal precedence and retirement contracts until removal is explicitly authorized. Do not duplicate the product marker pair in project documentation.
 
 ## Validation And Reporting
 
@@ -312,10 +332,10 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 - `Skills~/manifest.json` registers schema v2 `code-convention-help`, `code-convention-check`, and `code-convention-apply` for Codex and Claude with prefix `code-convention`.
 - The help skill is read-only and reads generated `PACKAGE_SKILLS.md` as the authoritative inventory.
-- The help skill resolves and reports the selected profile, effective stable IDs, capability gates, and installed owner routes.
-- The check skill is read-only. It compares documented rules, uses the six stable relationship categories, reports shadow or final retirement readiness, detects package-to-installed-skill drift, and proves repository state did not change.
+- The help skill resolves and reports the selected profile, effective stable IDs, explicit product-composition target, capability gates, and installed owner routes.
+- The check skill is read-only. It compares documented rules, validates a routed package-owned product declaration without inferring source compliance, uses the six stable relationship categories, reports shadow or final retirement readiness, detects package-to-installed-skill drift, and proves repository state did not change.
 - The check skill does not inventory or judge every source file. Use the separately installed AI Refactor package when a user requests an evidence-backed source inventory and staged architecture proposal.
-- The apply skill is write-capable but may be selected only after the user authorizes a concrete Unity code change. It works without local convention documents by reading the selected profile and installed owner guides. Project architecture supplies concrete facts, not an independent convention body. The `AFCC-TRE-001`, `AFCC-PKG-001`, and `AFCC-PRT-001` target applies only inside separately authorized architecture or package scope with observed evidence. The skill does not create edit authority or own Jira, Git branches, worktrees, pull requests, publishing, or deployment.
+- The apply skill is write-capable but may be selected only after the user authorizes a concrete Unity code change. It works without local convention documents by reading the selected profile and installed owner guides. Project architecture supplies concrete facts, not an independent convention body. The `AFCC-TRE-001`, `AFCC-PKG-001`, `AFCC-PCR-001`, `AFCC-PRT-001`, `AFCC-BND-001`, `AFCC-ANI-001`, and `AFCC-PKG-002` target applies only inside separately authorized architecture or package scope with observed evidence. The skill does not create edit authority or own Jira, Git branches, worktrees, pull requests, publishing, or deployment.
 - `Skills~/Shared/references/unity-code-authoring-rules.md` contains progressive details for architecture, communication, persistence, lifecycle, assets, assemblies, anti-patterns, and validation.
 - `Skills~/Shared/references/profiles/actionfit-unity.md` contains the opt-in profile's activation, capability, examples, and validation detail.
 - `Skills~/Shared/references/owner-routing.md` resolves concrete Time, UI Foundation, and ReferenceBinding contracts through installed guides.
@@ -338,7 +358,7 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 ## Release And Distribution Boundary
 
-- This `0.4.2` candidate targets the Public `ActionFit-Editor/AI_Code_Convention` repository under the package owner's distribution authorization.
+- This `0.4.4` candidate targets the Public `ActionFit-Editor/AI_Code_Convention` repository under the package owner's distribution authorization.
 - Public visibility does not permit credentials, tokens, private keys, or machine-specific configuration in the package and does not grant rights beyond explicit repository license terms.
 - Publishing is manual through Custom Package Manager. Do not create a repository, push, tag, append a catalog row, deploy, or install into global/home skill directories without separate authorization.
 - Before any later release, re-check remote tags and align `package.json`, README, this guide, PackageInfo, and release notes.

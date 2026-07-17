@@ -9,9 +9,9 @@ This package is distributed from a **Public** repository. It contains no Runtime
 ```json
 {
   "dependencies": {
-    "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.97",
-    "com.actionfit.referencebinding": "https://github.com/ActionFit-Editor/ReferenceBinding.git#0.1.1",
-    "com.actionfit.ai-codeconvention": "https://github.com/ActionFit-Editor/AI_Code_Convention.git#0.4.2"
+    "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.100",
+    "com.actionfit.referencebinding": "https://github.com/ActionFit-Editor/ReferenceBinding.git#0.1.2",
+    "com.actionfit.ai-codeconvention": "https://github.com/ActionFit-Editor/AI_Code_Convention.git#0.4.4"
   }
 }
 ```
@@ -24,9 +24,9 @@ Custom Package Manager resolves the two declared ActionFit dependencies when ins
 - README: `Tools > Package > AI Code Convention > README`.
 - If this package later owns or bootstraps a settings ScriptableObject, add `Setting SO` under the same package root.
 
-The convention template creates a new `MonoBehaviour` with example `Refs`, `Assets`, and `Settings` containers, private serialized backing fields, and getter-only access. Its `Refs.contentRoot` example uses `RequiredReference` plus exact-name `AutoWireChild`, its `Assets.iconSprite` example uses `RequiredReference` without hierarchy wiring, and `OnValidate` queues the owner through `ReferenceBindingRequests` only in the Editor. Unity owns the selected destination, rename interaction, `#SCRIPTNAME#` replacement, and root-namespace expansion.
+The convention template creates a new `MonoBehaviour` with example `Refs`, `Assets`, and `Settings` containers, private serialized backing fields, and getter-only access. Its `Refs.contentRoot` example uses `RequiredReference` plus exact-name `AutoWireChild`, its `Assets.iconSprite` example uses `RequiredReference` without hierarchy wiring, and the complete `OnValidate` declaration is Editor-guarded before it queues the owner through `ReferenceBindingRequests`. Unity owns the selected destination, rename interaction, `#SCRIPTNAME#` replacement, and root-namespace expansion.
 
-`com.actionfit.referencebinding@0.1.1` is a required dependency. The generated script compiles in Unity's predefined assemblies because the owner Runtime assembly is auto-referenced. A consuming custom asmdef must explicitly reference `com.actionfit.referencebinding`; the generator does not mutate project asmdefs. Invoking the menu does not select a profile, modify an existing script, save a Scene or Prefab, or prove that later edits remain compliant.
+`com.actionfit.referencebinding@0.1.2` is a required dependency. The generated script compiles in Unity's predefined assemblies because the owner Runtime assembly is auto-referenced. A consuming custom asmdef must explicitly reference `com.actionfit.referencebinding`; the generator does not mutate project asmdefs. Invoking the menu does not select a profile, modify an existing script, save a Scene or Prefab, or prove that later edits remain compliant.
 
 ## AI Guide
 
@@ -37,14 +37,17 @@ The convention template creates a new `MonoBehaviour` with example `Refs`, `Asse
 - The `actionfit-unity` profile separates Inspector-authored inputs into `Refs`, `Assets`, and `Settings`, exposes them through getter-only APIs, and keeps their stored values or reference identities unchanged during runtime.
 - The `actionfit-unity` profile prefers concrete ownership and permits a new interface only for an evidenced external contract, interchangeable production implementations, platform or runtime variants, or an unavoidable implementation-free assembly boundary. Existing interfaces are not automatic migration targets.
 - The `actionfit-unity` profile targets a tree-oriented ownership view whose concrete dependency graph is an acyclic DAG: composition roots assemble coherent feature or service nodes, reusable nodes can become project-neutral packages, and only evidenced external capabilities become narrow ports bound to project adapters at a composition root.
+- The `actionfit-unity` profile may keep concrete product composition in one product-owned, non-reusable package when its root `AI_GUIDE.md` explicitly declares `AI Product Composition Root: <package-id>` and `AI Refactor target: package-oriented-product` inside `## Package Identity`. These markers select only the product-composition target; they never select the code-convention profile or create migration authority.
+- New or deliberately revised scene code keeps `MonoBehaviour` classes as thin serialized binders, plain C# owners as the reusable logic boundary, and non-serialized animation helpers that receive exact targets and lifetime inputs from the binder.
+- Optional integration axes may become inward-dependent Leaf packages—Origin/Core, Unity Binding, UI Foundation Binding, DOTween Animation, SDK Adapter, and Installer—when each boundary can compile, test, version, and evolve coherently. A default installer may select the full set without forcing direct consumers to import every leaf.
 - The target is progressive. Package count, strict tree-shaped runtime references, speculative interfaces, dependency-injection containers, and whole-project remodeling are not goals.
 - Detailed architecture and validation guidance is installed progressively with the related Agent Skills.
 
-The selected package profile can be the sole code-convention authority. A consuming project does not need a separate local convention document when its router selects the profile and its architecture documents contain only factual project mappings.
+The selected package profile can be the sole code-convention authority. A consuming project does not need a separate local convention document when its router selects the profile, an explicitly declared product package owns any package-oriented composition target, and its remaining architecture documents contain only factual project mappings.
 
 ## Agent Skills
 
-Custom Package Manager `1.1.97` or newer installs the schema v2 skills into project-local agent folders while preserving modified or conflicting targets.
+Custom Package Manager `1.1.100` or newer installs the schema v2 skills into project-local agent folders while preserving modified or conflicting targets.
 
 - `$code-convention-help`: explains the selected profile, effective rule identifiers, owner routes, skills, and safety boundaries without changing state.
 - `$code-convention-check`: compares documented contracts, reports the effective profile-aware rule and local-convention retirement readiness, and proves the check did not change files.

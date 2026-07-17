@@ -54,7 +54,11 @@ PROFILE_RULE_IDS = (
     "AFCC-STY-001",
     "AFCC-TRE-001",
     "AFCC-PKG-001",
+    "AFCC-PCR-001",
     "AFCC-PRT-001",
+    "AFCC-BND-001",
+    "AFCC-ANI-001",
+    "AFCC-PKG-002",
     "AFCC-ORG-001",
     "AFCC-CMT-001",
     "AFCC-LOG-001",
@@ -87,6 +91,8 @@ CAT_ONLY_IDENTIFIERS = (
     "GameString",
     "UI_",
 )
+PRODUCT_ROOT_MARKER = "AI Product Composition Root: <package-id>"
+PRODUCT_TARGET_MARKER = "AI Refactor target: package-oriented-product"
 
 
 class CodeConventionSkillTests(unittest.TestCase):
@@ -238,11 +244,11 @@ class CodeConventionSkillTests(unittest.TestCase):
 
     def test_package_is_editor_only_and_uses_published_required_dependencies(self) -> None:
         manifest = json.loads((PACKAGE_ROOT / "package.json").read_text(encoding="utf-8"))
-        self.assertEqual("0.4.2", manifest["version"])
+        self.assertEqual("0.4.4", manifest["version"])
         self.assertEqual(
             {
-                "com.actionfit.custompackagemanager": "1.1.97",
-                "com.actionfit.referencebinding": "0.1.1",
+                "com.actionfit.custompackagemanager": "1.1.100",
+                "com.actionfit.referencebinding": "0.1.2",
             },
             manifest["dependencies"],
         )
@@ -320,12 +326,12 @@ class CodeConventionSkillTests(unittest.TestCase):
         ):
             self.assertIn(reference_binding_contract, template)
         self.assertIn(
-            "private void OnValidate()\n"
-            "    {\n"
             "#if UNITY_EDITOR\n"
+            "    private void OnValidate()\n"
+            "    {\n"
             "        ReferenceBindingRequests.Enqueue(this);\n"
-            "#endif\n"
-            "    }",
+            "    }\n"
+            "#endif",
             template,
         )
         self.assertEqual(2, template.count("RequiredReference"))
@@ -411,8 +417,8 @@ class CodeConventionSkillTests(unittest.TestCase):
         self.assertIn("do not install UniTask", profile)
         self.assertEqual(
             {
-                "com.actionfit.custompackagemanager": "1.1.97",
-                "com.actionfit.referencebinding": "0.1.1",
+                "com.actionfit.custompackagemanager": "1.1.100",
+                "com.actionfit.referencebinding": "0.1.2",
             },
             manifest["dependencies"],
         )
@@ -473,7 +479,15 @@ class CodeConventionSkillTests(unittest.TestCase):
         readme = (PACKAGE_ROOT / "README.md").read_text(encoding="utf-8")
         combined = "\n".join((guide, profile, shared, readme))
 
-        for rule_id in ("AFCC-TRE-001", "AFCC-PKG-001", "AFCC-PRT-001"):
+        for rule_id in (
+            "AFCC-TRE-001",
+            "AFCC-PKG-001",
+            "AFCC-PCR-001",
+            "AFCC-PRT-001",
+            "AFCC-BND-001",
+            "AFCC-ANI-001",
+            "AFCC-PKG-002",
+        ):
             self.assertIn(rule_id, guide)
             self.assertIn(rule_id, profile)
         for phrase in (
@@ -499,6 +513,98 @@ class CodeConventionSkillTests(unittest.TestCase):
             self.assertIn("`$refactor-plan`", help_skill)
             self.assertIn("Do not infer source violations", check_skill)
             self.assertIn("Do not treat an AI Refactor proposal as edit authority", apply_skill)
+
+    def test_product_composition_root_is_explicit_package_owned_and_profile_neutral(self) -> None:
+        guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
+        profile = PROFILE_REFERENCE.read_text(encoding="utf-8")
+        shared = SHARED_REFERENCE.read_text(encoding="utf-8")
+        retirement = RETIREMENT_REFERENCE.read_text(encoding="utf-8")
+        readme = (PACKAGE_ROOT / "README.md").read_text(encoding="utf-8")
+        combined = "\n".join((guide, profile, shared, readme))
+
+        for rule_id in ("AFCC-PCR-001", "AFCC-PRO-001", "AFCC-PKG-001"):
+            self.assertIn(rule_id, guide)
+        for marker in (PRODUCT_ROOT_MARKER, PRODUCT_TARGET_MARKER):
+            self.assertIn(marker, guide)
+            self.assertIn(marker, profile)
+            self.assertIn(marker, shared)
+            self.assertIn(marker, readme)
+        for phrase in (
+            "product-owned, non-reusable package",
+            "complete trimmed",
+            "`## Package Identity`",
+            "sibling `package.json` `name`",
+            "does not select `actionfit-unity`",
+            "Absence of both markers retains the generic architecture target",
+            "exactly one product package",
+            "creates no authority",
+        ):
+            self.assertIn(phrase, guide)
+        package_identity = guide.split("## Package Identity", 1)[1].split("##", 1)[0]
+        for marker_prefix in (
+            "AI Product Composition Root:",
+            "AI Refactor target:",
+        ):
+            self.assertFalse(
+                any(
+                    line.strip().startswith(marker_prefix)
+                    for line in package_identity.splitlines()
+                )
+            )
+        self.assertNotIn("com.actionfit.cat.app", combined)
+        self.assertIn("routing metadata", retirement)
+        self.assertIn("duplicated marker in project documentation", retirement)
+
+        marker_only_router = (
+            "# Project\n"
+            "AI Product Composition Root: com.example.product.app\n"
+            "AI Refactor target: package-oriented-product\n"
+        )
+        self.assertEqual("portable-core", self._resolve_profile(marker_only_router))
+        self.assertEqual(
+            "actionfit-unity",
+            self._resolve_profile(
+                marker_only_router
+                + "AI Code Convention profile: actionfit-unity\n"
+            ),
+        )
+
+        for agent in ("Codex", "Claude"):
+            help_skill = self._read_skill(agent, "code-convention-help")
+            check_skill = self._read_skill(agent, "code-convention-check")
+            apply_skill = self._read_skill(agent, "code-convention-apply")
+            for contents in (help_skill, check_skill, apply_skill):
+                self.assertIn("`AFCC-PCR-001`", contents)
+            for marker in (PRODUCT_ROOT_MARKER, PRODUCT_TARGET_MARKER):
+                self.assertIn(marker, help_skill)
+                self.assertIn(marker, check_skill)
+            self.assertIn("does not select `actionfit-unity`", help_skill)
+            self.assertIn("route that scope to `$refactor-plan`", check_skill)
+            self.assertIn("never duplicate it in project documentation", apply_skill)
+
+    def test_actionfit_binder_animation_and_leaf_rules_are_explicit(self) -> None:
+        guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
+        profile = PROFILE_REFERENCE.read_text(encoding="utf-8")
+        shared = SHARED_REFERENCE.read_text(encoding="utf-8")
+        combined = "\n".join((guide, profile, shared))
+
+        for phrase in (
+            "thin serialized binders",
+            "sole serialization owner",
+            "plain C#",
+            "exact targets",
+            "Origin/Core",
+            "UI Foundation Binding",
+            "DOTween Animation",
+            "one package per class",
+            "default installer",
+        ):
+            self.assertIn(phrase, combined)
+
+        cpp_rule = guide.split("### `AFCC-CPP-001`", 1)[1].split("### `AFCC-", 1)[0]
+        self.assertIn("complete declaration", cpp_rule)
+        self.assertIn("`OnValidate`", cpp_rule)
+        self.assertIn("#if UNITY_EDITOR", cpp_rule)
 
     def test_owner_routes_use_installed_guides_without_inventing_apis(self) -> None:
         routing = OWNER_ROUTING_REFERENCE.read_text(encoding="utf-8")
@@ -548,14 +654,14 @@ class CodeConventionSkillTests(unittest.TestCase):
 
         repository = "https://github.com/ActionFit-Editor/AI_Code_Convention.git"
         version = manifest["version"]
-        self.assertEqual("0.4.2", version)
+        self.assertEqual("0.4.4", version)
         self.assertIn(f"{repository}#{version}", readme)
         self.assertIn(repository, guide)
         self.assertIn(f"Current package version at generation time: `{version}`", guide)
         self.assertIn(f"This `{version}` candidate", guide)
         self.assertIn("_repositoryVisibility: 0", package_info)
-        self.assertIn("com.actionfit.custompackagemanager@1.1.97", package_info)
-        self.assertIn("com.actionfit.referencebinding@0.1.1", package_info)
+        self.assertIn("com.actionfit.custompackagemanager@1.1.100", package_info)
+        self.assertIn("com.actionfit.referencebinding@0.1.2", package_info)
         self.assertNotIn("`0.3.0`", package_info)
 
     def test_shell_wrapper_runs_the_python_contract_suite(self) -> None:

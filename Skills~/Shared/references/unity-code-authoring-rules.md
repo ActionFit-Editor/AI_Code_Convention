@@ -52,7 +52,15 @@ When the selected profile activates `AFCC-TRE-001`, begin with an ownership tree
 
 Apply `AFCC-PKG-001` only after direct source evidence shows a reusable, project-neutral capability. A package boundary must keep dependencies one-way and exclude project types, scene/prefab references, project-owned ScriptableObjects, save keys, asset IDs, and concrete SDKs. Engine/UI/adapter separation is useful only when those concerns have different reuse or ownership; smaller packages are not inherently better.
 
+`AFCC-PCR-001` permits a concrete composition layer to live in one product-owned, non-reusable package without weakening reusable-package neutrality. The package opts in only through the exact complete trimmed markers `AI Product Composition Root: <package-id>` and `AI Refactor target: package-oriented-product` inside its root guide's `## Package Identity`; the actual ID must equal the sibling manifest `name`. Resolve embedded packages before PackageCache and accept at most one declared product root. The marker pair does not select the code-convention profile, create edit authority, or prove that any migration has happened. Absence retains the generic architecture target; invalid or competing declarations are missing evidence or structural diagnostics, not permission to infer intent.
+
 Apply `AFCC-PRT-001` with `AFCC-INT-001`. A port represents a real external capability that a reusable node consumes. The package owns the narrow consumer-facing contract; a project composition root owns adapter selection and binding. One hypothetical implementation, test substitution alone, or a desire to add a DI container is not sufficient evidence. A neutral default must preserve semantics and must not turn missing required behavior into silent success.
+
+When `AFCC-BND-001` applies, keep new scene-facing `MonoBehaviour` classes as thin binders: they own Unity lifecycle, serialized `Refs`/`Assets`/`Settings`, subscriptions, and explicit calls. Plain C# feature owners hold reusable state and rules. This is a progressive boundary, not permission to rewrite every existing component.
+
+When `AFCC-ANI-001` applies, pass exact animation targets and settings from the binder into non-serialized animation helpers. The helper owns only runtime handles it creates and pairs them with cleanup. Capability-specific rules such as DOTween ownership still apply.
+
+When `AFCC-PKG-002` applies, keep Origin/Core free of optional UI, animation, SDK, ReferenceBinding, and project assemblies. Add inward-dependent Leaf packages only for independently replaceable dependency axes. Default installers may select the complete set, while direct consumers may choose a smaller dependency closure. One package per class and dependency cycles remain anti-patterns.
 
 Architecture analysis and implementation remain separate authorities. A read-only analysis can propose target nodes, package candidates, ports, adapters, phases, and validation, but it cannot create edit, migration, package publication, or whole-project remodeling authority.
 
@@ -199,8 +207,13 @@ Flag these patterns before adding more of them:
 - public API change mixed with unrelated refactoring.
 - package extraction proposed only because a folder or class can be made smaller;
 - a so-called tree that hides shared dependencies, cycles, lifetime ownership, or composition bindings;
+- package-oriented product composition inferred from package presence, repository identity, dependency names, folders, or source style instead of the exact package-owned marker pair;
+- duplicate, incomplete, misplaced, mismatched, or unsupported product-root declarations, or a product-owned composition root presented as a reusable package;
 - project types, scenes, save keys, asset IDs, or concrete SDKs referenced from a reusable package assembly;
 - one interface per implementation, a DI container, or a service locator introduced to make package wiring uniform;
+- a scene binder that duplicates reusable feature state or animation rules instead of explicitly calling their owners;
+- an animation helper that serializes the scene target it should receive from its caller;
+- an Origin/Core package that imports optional UI, tween, SDK, ReferenceBinding, or project assemblies;
 - profile or optional-library behavior inferred without an exact selector and capability evidence;
 - a concrete package API selected without reading the installed owner guide;
 
@@ -222,7 +235,8 @@ Run the smallest evidence that can prove the changed contract, then add risk-spe
 | Static/event hub | re-entry and cleanup | domain reload disabled when supported |
 | Live/remote data | default, range, failure fallback | rollout, kill switch, rollback, server compatibility |
 | Profile or owner route | exact selector, capability and installed guide | negative fixture without the optional capability |
-| Tree/package/port target | owner and edge map, cycle check, project-coupling evidence, qualifying port evidence | phased migration and project-adapter compatibility plan |
+| Tree/package/product-root/port target | owner and edge map, cycle check, project-coupling evidence, exact product marker pair and manifest match when opted in, qualifying port evidence | phased migration and project-adapter compatibility plan |
+| Binder/animation/Leaf boundary | serialized owner, plain-logic compile, explicit animation targets, dependency-isolation compile | lifecycle cleanup, optional integration matrix, default-bundle closure |
 | Convention retirement | shadow mapping, stale-link and skill-drift audit | package-only rerun after approved deletion |
 
 For every check, record the exact scope and distinguish package failures, project regressions, known issues, environment failures, and unverified manual behavior.

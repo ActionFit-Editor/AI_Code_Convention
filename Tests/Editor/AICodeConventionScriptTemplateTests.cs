@@ -44,12 +44,12 @@ namespace ActionFit.AICodeConvention.Editor.Tests
             StringAssert.Contains("private void OnValidate()", template.text);
             StringAssert.Contains("ReferenceBindingRequests.Enqueue(this);", template.text);
             StringAssert.Contains(
-                "private void OnValidate()\n" +
-                "    {\n" +
                 "#if UNITY_EDITOR\n" +
+                "    private void OnValidate()\n" +
+                "    {\n" +
                 "        ReferenceBindingRequests.Enqueue(this);\n" +
-                "#endif\n" +
-                "    }",
+                "    }\n" +
+                "#endif",
                 template.text);
             StringAssert.DoesNotContain(" set;", template.text);
             StringAssert.DoesNotContain("ReferenceBinding.Editor", template.text);
