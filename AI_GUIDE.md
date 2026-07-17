@@ -6,11 +6,11 @@ This file is the portable authority for generic Unity code-authoring rules distr
 
 - Package ID: `com.actionfit.ai-codeconvention`
 - Display name: AI Code Convention
-- Repository: `https://github.com/ActionFitGames/AI_Code_Convention.git`
-- Repository visibility: Private
-- Current package version at generation time: `0.4.1`
+- Repository: `https://github.com/ActionFit-Editor/AI_Code_Convention.git`
+- Repository visibility: Public
+- Current package version at generation time: `0.4.2`
 - Unity version: `6000.2`
-- Custom Package Manager dependency: published `1.1.96`
+- Custom Package Manager dependency: published `1.1.97`
 - ReferenceBinding dependency: published `0.1.1`
 
 ## Purpose And Boundary
@@ -36,7 +36,7 @@ The package does not prove that existing source code complies with its guidance.
 ## Design Input Provenance And Exclusions
 
 - The initial design input was verified by SHA-256 `480f4da5d4b47afaa0614b1b9d734022725f22abd98ff59d4e6afcb5a5099ac2` and rephrased into portable rules. The external file and its machine-specific path are not package content.
-- The input carried no public redistribution license notice. This package therefore remains a Private draft pending a separate ownership and distribution-rights review.
+- The input carried no standalone public redistribution license notice. The package owner has separately authorized public repository distribution of this rephrased package; public visibility does not add a license beyond the repository's explicit terms.
 - A detailed serialized-reference specialization in the input was intentionally excluded because it did not match the installed owner package's public surface. `AFCC-REF-001` and the installed `com.actionfit.referencebinding` guide are the only effective route; this package does not preserve obsolete API details.
 
 ## Project Router Registration
@@ -338,7 +338,7 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 ## Release And Distribution Boundary
 
-- This `0.4.1` candidate is Private because its design input does not include a public redistribution license notice.
-- A separate ownership and distribution-rights review is required before changing visibility or publishing publicly.
+- This `0.4.2` candidate targets the Public `ActionFit-Editor/AI_Code_Convention` repository under the package owner's distribution authorization.
+- Public visibility does not permit credentials, tokens, private keys, or machine-specific configuration in the package and does not grant rights beyond explicit repository license terms.
 - Publishing is manual through Custom Package Manager. Do not create a repository, push, tag, append a catalog row, deploy, or install into global/home skill directories without separate authorization.
 - Before any later release, re-check remote tags and align `package.json`, README, this guide, PackageInfo, and release notes.

@@ -15,10 +15,10 @@ MonoBehaviour:
   _packageId: com.actionfit.ai-codeconvention
   _displayName: AI Code Convention
   _repoName: AI_Code_Convention
-  _repositoryVisibility: 1
+  _repositoryVisibility: 0
   _owner: ActionFit
   _status: candidate
   _description: Portable Unity code-authoring rules with explicit profiles, tree-oriented
     package targets, API-owner routing, retirement checks, and authorized application.
-  _releaseNote: "- 내부 ActionFit 패키지 의존성을 검증된 최신 태그로 갱신했습니다.\n- 패키지 버전, 설치 예시, AI 가이드와 카탈로그 메타데이터를 함께 맞췄습니다.\n- 기존 런타임 API와 프로젝트 소유 설정은 변경하지 않았습니다."
-  _dependenciesOverride: com.actionfit.custompackagemanager@1.1.96;com.actionfit.referencebinding@0.1.1
+  _releaseNote: "- 저장소 대상을 Public `ActionFit-Editor/AI_Code_Convention`으로 전환해 별도 Private 접근 권한 없이 패키지를 설치할 수 있도록 준비했습니다.\n- Custom Package Manager 의존성을 `1.1.97`로 갱신해 Public-default 저장소 정책과 동일한 생성·배포 계약을 사용합니다.\n- README와 AI 가이드의 설치 URL, visibility, 버전 정보를 `0.4.2` 공개 배포 후보와 일치시켰습니다.\n- 기존 AFCC 규칙 ID, Editor API, 직렬화 계약과 ReferenceBinding `0.1.1` 의존성은 변경하지 않았습니다."
+  _dependenciesOverride: com.actionfit.custompackagemanager@1.1.97;com.actionfit.referencebinding@0.1.1

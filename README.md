@@ -2,16 +2,16 @@
 
 Portable Unity code-authoring guidance for Codex and Claude. The package combines a portable core with explicitly selected profiles, routes concrete APIs to their installed owners, applies effective rules only inside a user-authorized code change, and provides one opt-in ActionFit MonoBehaviour starter template with required ReferenceBinding support.
 
-This package remains **Private**. It contains no Runtime assembly, EventBus implementation, gameplay framework, analyzer, formatter, or general-purpose code-generation framework. Its Editor-only generator creates one new convention starter script through Unity's native Project window flow.
+This package is distributed from a **Public** repository. It contains no Runtime assembly, EventBus implementation, gameplay framework, analyzer, formatter, or general-purpose code-generation framework. Its Editor-only generator creates one new convention starter script through Unity's native Project window flow. Public visibility makes the source readable but does not embed credentials or grant rights beyond the repository's explicit license terms.
 
 ## Install
 
 ```json
 {
   "dependencies": {
-    "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.96",
+    "com.actionfit.custompackagemanager": "https://github.com/ActionFit-Editor/Custom_Package_Manager.git#1.1.97",
     "com.actionfit.referencebinding": "https://github.com/ActionFit-Editor/ReferenceBinding.git#0.1.1",
-    "com.actionfit.ai-codeconvention": "https://github.com/ActionFitGames/AI_Code_Convention.git#0.4.1"
+    "com.actionfit.ai-codeconvention": "https://github.com/ActionFit-Editor/AI_Code_Convention.git#0.4.2"
   }
 }
 ```
@@ -44,7 +44,7 @@ The selected package profile can be the sole code-convention authority. A consum
 
 ## Agent Skills
 
-Custom Package Manager `1.1.96` or newer installs the schema v2 skills into project-local agent folders while preserving modified or conflicting targets.
+Custom Package Manager `1.1.97` or newer installs the schema v2 skills into project-local agent folders while preserving modified or conflicting targets.
 
 - `$code-convention-help`: explains the selected profile, effective rule identifiers, owner routes, skills, and safety boundaries without changing state.
 - `$code-convention-check`: compares documented contracts, reports the effective profile-aware rule and local-convention retirement readiness, and proves the check did not change files.
@@ -60,4 +60,4 @@ The comparison skill reports `Aligned`, `Local Extension`, `Conflict — Local W
 
 - Serialized-reference behavior is routed to the required `com.actionfit.referencebinding/AI_GUIDE.md`; this package consumes its documented public attributes and owner queue without reproducing its APIs or adding asset-writing modes.
 - Package publication, repository creation, tags, and catalog registration are separate manual operations.
-- Public redistribution requires a separate ownership and distribution-rights review.
+- Public distribution has been authorized for this package. Tokens, credentials, and private configuration remain prohibited from package content regardless of repository visibility.
