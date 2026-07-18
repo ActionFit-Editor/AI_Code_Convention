@@ -8,7 +8,7 @@ This file is the portable authority for generic Unity code-authoring rules distr
 - Display name: AI Code Convention
 - Repository: `https://github.com/ActionFit-Editor/AI_Code_Convention.git`
 - Repository visibility: Public
-- Current package version at generation time: `0.4.5`
+- Current package version at generation time: `0.4.8`
 - Unity version: `6000.2`
 - Custom Package Manager dependency: release candidate `1.1.100`
 - ReferenceBinding dependency: published `0.1.2`
