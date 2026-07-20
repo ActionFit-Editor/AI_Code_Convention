@@ -93,6 +93,11 @@ CAT_ONLY_IDENTIFIERS = (
 )
 PRODUCT_ROOT_MARKER = "AI Product Composition Root: <package-id>"
 PRODUCT_TARGET_MARKER = "AI Refactor target: package-oriented-product"
+EXPECTED_PACKAGE_VERSION = "0.4.9"
+EXPECTED_DEPENDENCIES = {
+    "com.actionfit.custompackagemanager": "1.1.106",
+    "com.actionfit.referencebinding": "0.1.3",
+}
 
 
 class CodeConventionSkillTests(unittest.TestCase):
@@ -244,14 +249,8 @@ class CodeConventionSkillTests(unittest.TestCase):
 
     def test_package_is_editor_only_and_uses_published_required_dependencies(self) -> None:
         manifest = json.loads((PACKAGE_ROOT / "package.json").read_text(encoding="utf-8"))
-        self.assertEqual("0.4.4", manifest["version"])
-        self.assertEqual(
-            {
-                "com.actionfit.custompackagemanager": "1.1.100",
-                "com.actionfit.referencebinding": "0.1.2",
-            },
-            manifest["dependencies"],
-        )
+        self.assertEqual(EXPECTED_PACKAGE_VERSION, manifest["version"])
+        self.assertEqual(EXPECTED_DEPENDENCIES, manifest["dependencies"])
         self.assertFalse((PACKAGE_ROOT / "Runtime").exists())
         self.assertTrue(SCRIPT_TEMPLATE.is_file())
         self.assertTrue(SCRIPT_TEMPLATE_MENU.is_file())
@@ -368,8 +367,11 @@ class CodeConventionSkillTests(unittest.TestCase):
 
         for docs in (readme, guide):
             self.assertIn(menu_path.replace("/", " > "), docs)
-        self.assertIn("does not select a profile", readme)
-        self.assertIn("required dependency", readme)
+        self.assertIn("AFCC-PRO-001", readme)
+        self.assertIn(
+            f"com.actionfit.referencebinding@{EXPECTED_DEPENDENCIES['com.actionfit.referencebinding']}",
+            readme,
+        )
         self.assertIn("does not read or write the repository's profile selector", guide)
         self.assertIn("RequiredReference", guide)
         self.assertIn("AutoWireChild", guide)
@@ -415,13 +417,7 @@ class CodeConventionSkillTests(unittest.TestCase):
         self.assertIn("DG.Tweening", profile)
         self.assertIn("com.actionfit.sosingleton", profile)
         self.assertIn("do not install UniTask", profile)
-        self.assertEqual(
-            {
-                "com.actionfit.custompackagemanager": "1.1.100",
-                "com.actionfit.referencebinding": "0.1.2",
-            },
-            manifest["dependencies"],
-        )
+        self.assertEqual(EXPECTED_DEPENDENCIES, manifest["dependencies"])
 
     def test_actionfit_serialized_inputs_are_role_split_and_runtime_read_only(self) -> None:
         guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
@@ -469,8 +465,7 @@ class CodeConventionSkillTests(unittest.TestCase):
         self.assertIn("one implementation", profile)
         self.assertIn("service locator", profile)
         self.assertIn("separate authority", profile)
-        self.assertIn("prefers concrete ownership", readme)
-        self.assertIn("Existing interfaces are not automatic migration targets", readme)
+        self.assertIn("AFCC-INT-001", readme)
 
     def test_actionfit_target_is_tree_oriented_package_neutral_and_port_guarded(self) -> None:
         guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
@@ -654,14 +649,14 @@ class CodeConventionSkillTests(unittest.TestCase):
 
         repository = "https://github.com/ActionFit-Editor/AI_Code_Convention.git"
         version = manifest["version"]
-        self.assertEqual("0.4.4", version)
+        self.assertEqual(EXPECTED_PACKAGE_VERSION, version)
         self.assertIn(f"{repository}#{version}", readme)
         self.assertIn(repository, guide)
         self.assertIn(f"Current package version at generation time: `{version}`", guide)
         self.assertIn(f"This `{version}` candidate", guide)
         self.assertIn("_repositoryVisibility: 0", package_info)
-        self.assertIn("com.actionfit.custompackagemanager@1.1.100", package_info)
-        self.assertIn("com.actionfit.referencebinding@0.1.2", package_info)
+        for package_id, dependency_version in EXPECTED_DEPENDENCIES.items():
+            self.assertIn(f"{package_id}@{dependency_version}", package_info)
         self.assertNotIn("`0.3.0`", package_info)
 
     def test_shell_wrapper_runs_the_python_contract_suite(self) -> None:

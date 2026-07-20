@@ -8,10 +8,10 @@ This file is the portable authority for generic Unity code-authoring rules distr
 - Display name: AI Code Convention
 - Repository: `https://github.com/ActionFit-Editor/AI_Code_Convention.git`
 - Repository visibility: Public
-- Current package version at generation time: `0.4.8`
+- Current package version at generation time: `0.4.9`
 - Unity version: `6000.2`
-- Custom Package Manager dependency: release candidate `1.1.100`
-- ReferenceBinding dependency: published `0.1.2`
+- Custom Package Manager dependency: release candidate `1.1.106`
+- ReferenceBinding dependency: published `0.1.3`
 
 ## Purpose And Boundary
 
@@ -28,7 +28,7 @@ The package does not prove that existing source code complies with its guidance.
 - The generated starter contains example `Refs`, `Assets`, and `Settings` containers under `AFCC-RFS-002`, private `[SerializeField]` backing fields and getter-only access under `AFCC-SER-004`, and no empty lifecycle methods.
 - `Refs.contentRoot` uses `RequiredReference("CONTENT_ROOT_MISSING")` and `AutoWireChild("ContentRoot")`. The exact GameObject name is the AutoWire search key, while the Required string is a diagnostic identifier. `Assets.iconSprite` uses `RequiredReference("ICON_SPRITE_MISSING")` without `AutoWireChild`; `Settings` has no reference attributes.
 - The complete `OnValidate` declaration is wrapped in `#if UNITY_EDITOR`. Editor compilation still enqueues the owning `MonoBehaviour`, never a nested container, while Player compilation emits neither the method nor the Editor-only request type.
-- `com.actionfit.referencebinding@0.1.2` is a required package dependency and owns attribute, processing, validation, Play Mode, Dirty-state, and save behavior. The generator never saves a Scene or Prefab. It also never replaces a valid manual reference or defines a second reference-processing API.
+- `com.actionfit.referencebinding@0.1.3` is a required package dependency and owns attribute, processing, validation, Play Mode, Dirty-state, and save behavior. The generator never saves a Scene or Prefab. It also never replaces a valid manual reference or defines a second reference-processing API.
 - The generated output compiles in Unity predefined assemblies through ReferenceBinding's auto-referenced Runtime assembly. A consuming custom asmdef must explicitly reference `com.actionfit.referencebinding`; package installation alone does not add that assembly reference, and this generator does not mutate consuming asmdefs.
 - Invoking this menu is an explicit request for the `actionfit-unity` starter shape. It does not read or write the repository's profile selector, infer a profile, create or change an asmdef, overwrite or migrate existing scripts, or enforce runtime immutability mechanically.
 - The generated file is user-owned after creation. Replace the example fields with feature-specific inputs while preserving the selected effective rules. Package updates never rewrite generated scripts, and the starter alone is not source-compliance proof.
@@ -358,7 +358,7 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 ## Release And Distribution Boundary
 
-- This `0.4.4` candidate targets the Public `ActionFit-Editor/AI_Code_Convention` repository under the package owner's distribution authorization.
+- This `0.4.9` candidate targets the Public `ActionFit-Editor/AI_Code_Convention` repository under the package owner's distribution authorization.
 - Public visibility does not permit credentials, tokens, private keys, or machine-specific configuration in the package and does not grant rights beyond explicit repository license terms.
 - Publishing is manual through Custom Package Manager. Do not create a repository, push, tag, append a catalog row, deploy, or install into global/home skill directories without separate authorization.
 - Before any later release, re-check remote tags and align `package.json`, README, this guide, PackageInfo, and release notes.
