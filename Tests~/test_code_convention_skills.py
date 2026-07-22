@@ -71,6 +71,7 @@ PROFILE_RULE_IDS = (
     "AFCC-LOP-001",
     "AFCC-RFS-001",
     "AFCC-RFS-002",
+    "AFCC-RFS-003",
     "AFCC-SER-004",
     "AFCC-TWN-001",
     "AFCC-SER-003",
@@ -93,10 +94,10 @@ CAT_ONLY_IDENTIFIERS = (
 )
 PRODUCT_ROOT_MARKER = "AI Product Composition Root: <package-id>"
 PRODUCT_TARGET_MARKER = "AI Refactor target: package-oriented-product"
-EXPECTED_PACKAGE_VERSION = "0.4.9"
+EXPECTED_PACKAGE_VERSION = "0.5.0"
 EXPECTED_DEPENDENCIES = {
     "com.actionfit.custompackagemanager": "1.1.106",
-    "com.actionfit.referencebinding": "0.1.3",
+    "com.actionfit.referencebinding": "0.2.0",
 }
 
 
@@ -193,6 +194,9 @@ class CodeConventionSkillTests(unittest.TestCase):
             self.assertIn("resolve the required `com.actionfit.referencebinding/AI_GUIDE.md`", contents)
             self.assertIn("stop before authoring serialized-reference code", contents)
             self.assertIn("Continue normally when local convention documents are absent", contents)
+            self.assertIn("`AFCC-RFS-003`", contents)
+            self.assertIn("`AFCC-DOC-001`", contents)
+            self.assertIn("Do not issue a normal completion report", contents)
 
         metadata = (
             SKILLS_ROOT
@@ -218,6 +222,7 @@ class CodeConventionSkillTests(unittest.TestCase):
             "AFCC-PRE-002",
             "AFCC-AUT-001",
             "AFCC-CHG-001",
+            "AFCC-DOC-001",
             "AFCC-ADP-001",
             "AFCC-DEC-001",
             "AFCC-OWN-001",
@@ -429,7 +434,12 @@ class CodeConventionSkillTests(unittest.TestCase):
         self.assertIn("Deprecated", deprecated_refs)
         self.assertIn("`AFCC-RFS-002`", deprecated_refs)
         self.assertIn("`AFCC-SER-004`", deprecated_refs)
-        for rule_id in ("AFCC-RFS-001", "AFCC-RFS-002", "AFCC-SER-004"):
+        for rule_id in (
+            "AFCC-RFS-001",
+            "AFCC-RFS-002",
+            "AFCC-RFS-003",
+            "AFCC-SER-004",
+        ):
             self.assertIn(rule_id, profile)
         self.assertIn("AFCC-RFS-002", guide)
         self.assertIn("AFCC-SER-004", guide)
@@ -443,13 +453,45 @@ class CodeConventionSkillTests(unittest.TestCase):
         self.assertIn("separately owned runtime model", guide)
         self.assertIn("never `AutoWireChild`", profile)
         self.assertIn("does not search the AssetDatabase", profile)
+        self.assertIn("every newly created or deliberately revised mandatory `Refs`", profile)
+        self.assertIn("explicitly authorized asset-edit scope", profile)
+        self.assertIn("old/new hierarchy paths", profile)
+        self.assertIn("Untouched legacy fields", profile)
 
         for agent in ("Codex", "Claude"):
             apply_skill = self._read_skill(agent, "code-convention-apply")
             self.assertIn("`AFCC-RFS-002`", apply_skill)
+            self.assertIn("`AFCC-RFS-003`", apply_skill)
             self.assertIn("`AFCC-SER-004`", apply_skill)
             self.assertIn("getter-only access", apply_skill)
             self.assertIn("separate runtime model", apply_skill)
+            self.assertIn("Never select the first duplicate", apply_skill)
+            self.assertIn("every old/new path", apply_skill)
+            self.assertIn("Untouched legacy fields are not bulk-migrated", apply_skill)
+
+    def test_document_completion_gate_requires_semantic_reread_and_validator(self) -> None:
+        guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")
+        shared = SHARED_REFERENCE.read_text(encoding="utf-8")
+        readme = (PACKAGE_ROOT / "README.md").read_text(encoding="utf-8")
+
+        for contents in (guide, shared, readme):
+            self.assertIn("AFCC-DOC-001", contents)
+        self.assertIn("re-read those sources completely", guide)
+        self.assertIn("A validator pass does not replace semantic re-reading", guide)
+        self.assertIn("unrelated validator failures as separate blockers", guide)
+        self.assertIn("Documentation completion gate", shared)
+
+        for agent in ("Codex", "Claude"):
+            help_skill = self._read_skill(agent, "code-convention-help")
+            check_skill = self._read_skill(agent, "code-convention-check")
+            apply_skill = self._read_skill(agent, "code-convention-apply")
+            self.assertIn("`AFCC-DOC-001`", help_skill)
+            self.assertIn("`AFCC-DOC-001`", check_skill)
+            self.assertIn("Apply `AFCC-DOC-001` before reporting completion", apply_skill)
+            self.assertIn("Re-read completely the primary router", apply_skill)
+            self.assertIn("Run every repository-declared documentation", apply_skill)
+            self.assertIn("A validator pass never replaces semantic re-reading", apply_skill)
+            self.assertIn("Do not issue a normal completion report", apply_skill)
 
     def test_actionfit_interfaces_require_evidenced_production_contracts(self) -> None:
         guide = (PACKAGE_ROOT / "AI_GUIDE.md").read_text(encoding="utf-8")

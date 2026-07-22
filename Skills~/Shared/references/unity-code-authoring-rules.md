@@ -173,6 +173,8 @@ When the selected profile activates `AFCC-SER-004`, treat Inspector-authored ser
 
 Serialized-reference attributes, validation, and repair APIs belong to the required ReferenceBinding owner package. Read `com.actionfit.referencebinding/AI_GUIDE.md`; do not infer write or save operations from this generic reference. Its package dependency makes the Runtime assembly available to predefined assemblies, but a custom consuming asmdef still needs an explicit `com.actionfit.referencebinding` reference.
 
+When the selected profile activates `AFCC-RFS-003`, treat each newly created or deliberately revised supported mandatory `Refs` Component field as selector-owned. Use `RequiredReference` and `AutoWireChild` together plus the Editor-guarded owner enqueue. Resolve duplicate same-type/same-name candidates through an existing valid serialized reference or an explicit user decision. Any temporary duplicate rename requires exact asset-edit authority, deterministic collision-free naming, old/new hierarchy path reporting, runtime-name and Animation-binding impact checks, targeted serialized diff review, and reload validation. Do not weaken the rule into first-match selection, runtime lookup, or an optional attribute merely because the hierarchy is ambiguous.
+
 Assembly direction:
 
 ```text
@@ -219,6 +221,10 @@ Flag these patterns before adding more of them:
 
 An existing occurrence is evidence, not automatic authority to fix it. Report it and split remediation into a separately authorized task unless the current scope explicitly owns it.
 
+### Documentation completion gate
+
+Apply `AFCC-DOC-001` after the final diff is known. Re-read every governing and final-diff-routed document completely, reconcile it with the implemented ownership and validation paths, and then run each repository-declared documentation or package validator. Semantic re-reading and mechanical validation are independent completion requirements.
+
 ## Validation Matrix
 
 Run the smallest evidence that can prove the changed contract, then add risk-specific checks.
@@ -238,5 +244,6 @@ Run the smallest evidence that can prove the changed contract, then add risk-spe
 | Tree/package/product-root/port target | owner and edge map, cycle check, project-coupling evidence, exact product marker pair and manifest match when opted in, qualifying port evidence | phased migration and project-adapter compatibility plan |
 | Binder/animation/Leaf boundary | serialized owner, plain-logic compile, explicit animation targets, dependency-isolation compile | lifecycle cleanup, optional integration matrix, default-bundle closure |
 | Convention retirement | shadow mapping, stale-link and skill-drift audit | package-only rerun after approved deletion |
+| `AFCC-DOC-001` documentation completion gate | complete re-read of governing and final-diff-routed documents, exact repository validator command and result | CI failure propagation, owner or package version drift, unrelated blocker classification |
 
 For every check, record the exact scope and distinguish package failures, project regressions, known issues, environment failures, and unverified manual behavior.

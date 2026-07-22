@@ -129,7 +129,7 @@ When an evidenced project loop owner exists, `AFCC-LOP-001` selects the phase wh
 
 ### Serialized fields and owner-routed UI
 
-`AFCC-RFS-001` is deprecated. Existing mixed public `refs` fields may remain until an explicitly approved serialization migration, but new or deliberately revised inputs use `AFCC-RFS-002` and `AFCC-SER-004`.
+`AFCC-RFS-001` is deprecated. Existing mixed public `refs` fields may remain until an explicitly approved serialization migration, but new or deliberately revised inputs use `AFCC-RFS-002`, `AFCC-RFS-003`, and `AFCC-SER-004`.
 
 Use three role-specific containers:
 
@@ -175,7 +175,9 @@ public Settings Configuration => settings;
 
 Do not add setters or runtime mutation methods. The serialized inputs may be established by declaration defaults, Unity deserialization, or Editor-only authoring before Play Mode. Once runtime begins, do not replace the containers or assign their fields. Copy any value that must change into a separately owned runtime model. Returning a Component or asset does not freeze that referenced object's internal state; only the stored reference identity remains fixed.
 
-`com.actionfit.referencebinding` is a required dependency of this package rather than an optional capability gate. Use `RequiredReference` on mandatory `Refs` fields and add `AutoWireChild` only when the Component type plus exact root-or-descendant GameObject name defines one unique hierarchy candidate. `Assets` may use `RequiredReference` for mandatory references but never `AutoWireChild`; ReferenceBinding does not search the AssetDatabase or prove that a reference is persistent. Wrap the owner MonoBehaviour's complete `OnValidate` declaration and `ReferenceBindingRequests.Enqueue(this)` call in `#if UNITY_EDITOR`. A custom consuming asmdef must explicitly reference `com.actionfit.referencebinding`; package installation does not rewrite asmdefs. Editor-only attributes and tools may author private fields before Play Mode, but the installed owner must reject Player and Play-Mode mutation paths.
+`com.actionfit.referencebinding` is a required dependency of this package rather than an optional capability gate. Under `AFCC-RFS-003`, every newly created or deliberately revised mandatory `Refs` Component field in a supported ReferenceBinding shape uses `RequiredReference` and authoritative `AutoWireChild` together. The selector is the exact, case-sensitive root-or-descendant GameObject name, and the owner MonoBehaviour wraps its complete `OnValidate` declaration and `ReferenceBindingRequests.Enqueue(this)` call in `#if UNITY_EDITOR`. A custom consuming asmdef must explicitly reference `com.actionfit.referencebinding`; package installation does not rewrite asmdefs. `Assets` may use `RequiredReference` for mandatory references but never `AutoWireChild`; ReferenceBinding does not search the AssetDatabase or prove that a reference is persistent. Editor-only attributes and tools may author private fields before Play Mode, but the installed owner must reject Player and Play-Mode mutation paths.
+
+Resolve selector ambiguity before authoring. Use an existing valid serialized reference or an explicit user decision to identify the intended candidate. When the same Component type and name still collide, do not select the first result or omit `AutoWireChild`. Rename only non-selected duplicates, only inside an explicitly authorized asset-edit scope, with deterministic collision-free temporary names derived from the original name and stable hierarchy order. Report the old/new hierarchy paths, search for runtime name lookups, Animation bindings, and external tool contracts, inspect the targeted serialized diff, and verify reload without reference loss. Without intended-candidate evidence, asset-name edit authority, or validation evidence, stop and report the ambiguity. Untouched legacy fields remain outside automatic migration.
 
 A standalone serialized field remains valid when a container would obscure ownership. Resolve concrete component wrappers and reference-binding shapes through `references/owner-routing.md` rather than copying types from another consuming project. Moving an existing field between containers changes its serialized property path, so apply the new shape progressively and use the approved serialization migration contract for existing assets.
 
@@ -199,6 +201,8 @@ An auto-killed field and `IsActive()` do not prove ownership. Target-wide kill i
 ## Minimum Validation
 
 - Confirm the exact selector and list every activated or inactive capability rule.
+- For `AFCC-RFS-003`, verify every newly created or deliberately revised supported mandatory `Refs` Component field has both attributes and an Editor-guarded owner enqueue; verify duplicate-name remediation has explicit asset authority, reported path mappings, targeted diff inspection, and reload evidence.
+- For `AFCC-DOC-001`, re-read every governing and final-diff-routed document, run the repository-declared documentation validators, and report unrelated failures without modifying their owners.
 - Inspect the touched file's existing style before applying organization or comment rules.
 - Compile the affected assembly after async, conditional compilation, owner API, or optional-library changes.
 - Exercise success, cancellation, repeated enable/disable, and disposal for lifetime-sensitive work.
