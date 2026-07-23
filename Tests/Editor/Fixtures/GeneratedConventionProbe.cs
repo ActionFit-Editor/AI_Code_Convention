@@ -38,9 +38,7 @@ public class GeneratedConventionProbe : MonoBehaviour
     [Serializable]
     public sealed class Refs
     {
-        [SerializeField]
-        [RequiredReference("CONTENT_ROOT_MISSING")]
-        [AutoWireChild("ContentRoot")]
+        [SerializeField, RequiredChildReference("ContentRoot")]
         private Transform contentRoot;
 
         public Transform ContentRoot => contentRoot;

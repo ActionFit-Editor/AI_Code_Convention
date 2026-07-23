@@ -32,8 +32,9 @@ namespace ActionFit.AICodeConvention.Editor.Tests
             StringAssert.Contains("public sealed class Assets", template.text);
             StringAssert.Contains("public sealed class Settings", template.text);
             StringAssert.Contains("using ReferenceBinding;", template.text);
-            StringAssert.Contains("[RequiredReference(\"CONTENT_ROOT_MISSING\")]", template.text);
-            StringAssert.Contains("[AutoWireChild(\"ContentRoot\")]", template.text);
+            StringAssert.Contains(
+                "[SerializeField, RequiredChildReference(\"ContentRoot\")]",
+                template.text);
             StringAssert.Contains("private Transform contentRoot;", template.text);
             StringAssert.Contains("[RequiredReference(\"ICON_SPRITE_MISSING\")]", template.text);
             StringAssert.Contains("private Sprite iconSprite;", template.text);
@@ -73,13 +74,12 @@ namespace ActionFit.AICodeConvention.Editor.Tests
 
             Assert.That(field, Is.Not.Null);
 
-            var required = field.GetCustomAttribute<RequiredReferenceAttribute>();
-            var autoWire = field.GetCustomAttribute<AutoWireChildAttribute>();
+            var requiredChild = field.GetCustomAttribute<RequiredChildReferenceAttribute>();
 
-            Assert.That(required, Is.Not.Null);
-            Assert.That(required.ErrorCode, Is.EqualTo("CONTENT_ROOT_MISSING"));
-            Assert.That(autoWire, Is.Not.Null);
-            Assert.That(autoWire.ObjectName, Is.EqualTo("ContentRoot"));
+            Assert.That(requiredChild, Is.Not.Null);
+            Assert.That(requiredChild.ObjectName, Is.EqualTo("ContentRoot"));
+            Assert.That(field.GetCustomAttribute<RequiredReferenceAttribute>(), Is.Null);
+            Assert.That(field.GetCustomAttribute<AutoWireChildAttribute>(), Is.Null);
 
             FieldInfo assetField = typeof(ActionFit.TemplateSmoke.GeneratedConventionProbe.Assets)
                 .GetField("iconSprite", BindingFlags.Instance | BindingFlags.NonPublic);
