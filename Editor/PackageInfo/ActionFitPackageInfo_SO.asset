@@ -20,13 +20,10 @@ MonoBehaviour:
   _status: candidate
   _description: Portable Unity code-authoring rules with explicit profiles, tree-oriented
     package targets, API-owner routing, retirement checks, and authorized application.
-  _releaseNote: "- \uD544\uC218 child Component\uC758 \uC0C8 \uC791\uC131 \uD45C\uC900\uC744
-    `[SerializeField, RequiredChildReference(\"ExactGameObjectName\")]`\uB85C \uD1B5\uD569\uD55C
-    `AFCC-RFS-004`\uB97C \uCD94\uAC00\uD588\uC2B5\uB2C8\uB2E4.\n- \uAE30\uC874 `RequiredReference`+`AutoWireChild`
-    \uACC4\uC57D\uC778 `AFCC-RFS-003`\uC740 deprecated \uD638\uD658 \uADDC\uCE59\uC73C\uB85C
-    \uBCF4\uC874\uD558\uBA70 \uC77C\uAD04 \uB9C8\uC774\uADF8\uB808\uC774\uC158\uD558\uC9C0
-    \uC54A\uC2B5\uB2C8\uB2E4.\n- MonoBehaviour starter\uC640 Codex/Claude \uC2A4\uD0AC\uC744
-    \uC0C8 \uD1B5\uD569 \uBC14\uC778\uB529 \uBC29\uC2DD\uC73C\uB85C \uAC31\uC2E0\uD588\uC2B5\uB2C8\uB2E4.\n-
-    \uD328\uD0A4\uC9C0 \uBC84\uC804\uC744 0.5.1\uB85C \uC62C\uB9AC\uACE0 `com.actionfit.referencebinding`
-    \uC758\uC874\uC131\uC744 0.2.1\uB85C \uC815\uB82C\uD588\uC2B5\uB2C8\uB2E4."
-  _dependenciesOverride: com.actionfit.custompackagemanager@1.1.106;com.actionfit.referencebinding@0.2.1
+  _releaseNote: "- consumer `OnValidate` \uC5C6\uC774 package-owned Editor pump\uB97C
+    \uC0AC\uC6A9\uD558\uB294 `AFCC-RFS-005`\uB97C \uCD94\uAC00\uD588\uC2B5\uB2C8\uB2E4.\n-
+    \uAE30\uC874 `AFCC-RFS-004` \uC758\uBBF8\uB294 deprecated \uD638\uD658 \uADDC\uCE59\uC73C\uB85C
+    \uBCF4\uC874\uD558\uACE0 template\xB7skill\xB7\uD14C\uC2A4\uD2B8\uB97C \uC0C8
+    \uACC4\uC57D\uC5D0 \uB9DE\uCDC4\uC2B5\uB2C8\uB2E4.\n- `com.actionfit.referencebinding@0.2.2`
+    \uC758\uC874\uC131\uACFC \uD328\uD0A4\uC9C0 \uBC84\uC804\uC744 \uC815\uB82C\uD588\uC2B5\uB2C8\uB2E4."
+  _dependenciesOverride: com.actionfit.custompackagemanager@1.1.106;com.actionfit.referencebinding@0.2.2

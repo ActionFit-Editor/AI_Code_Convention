@@ -42,16 +42,8 @@ namespace ActionFit.AICodeConvention.Editor.Tests
             StringAssert.Contains("public Refs References => refs;", template.text);
             StringAssert.Contains("public Assets AssetReferences => assets;", template.text);
             StringAssert.Contains("public Settings Configuration => settings;", template.text);
-            StringAssert.Contains("private void OnValidate()", template.text);
-            StringAssert.Contains("ReferenceBindingRequests.Enqueue(this);", template.text);
-            StringAssert.Contains(
-                "#if UNITY_EDITOR\n" +
-                "    private void OnValidate()\n" +
-                "    {\n" +
-                "        ReferenceBindingRequests.Enqueue(this);\n" +
-                "    }\n" +
-                "#endif",
-                template.text);
+            StringAssert.DoesNotContain("private void OnValidate()", template.text);
+            StringAssert.DoesNotContain("ReferenceBindingRequests.Enqueue(this);", template.text);
             StringAssert.DoesNotContain(" set;", template.text);
             StringAssert.DoesNotContain("ReferenceBinding.Editor", template.text);
             StringAssert.DoesNotContain("void Start", template.text);
@@ -93,7 +85,7 @@ namespace ActionFit.AICodeConvention.Editor.Tests
                 typeof(ActionFit.TemplateSmoke.GeneratedConventionProbe).GetMethod(
                     "OnValidate",
                     BindingFlags.Instance | BindingFlags.NonPublic),
-                Is.Not.Null);
+                Is.Null);
         }
     }
 }

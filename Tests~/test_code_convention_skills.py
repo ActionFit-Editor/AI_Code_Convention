@@ -73,6 +73,7 @@ PROFILE_RULE_IDS = (
     "AFCC-RFS-002",
     "AFCC-RFS-003",
     "AFCC-RFS-004",
+    "AFCC-RFS-005",
     "AFCC-SER-004",
     "AFCC-TWN-001",
     "AFCC-SER-003",
@@ -95,10 +96,10 @@ CAT_ONLY_IDENTIFIERS = (
 )
 PRODUCT_ROOT_MARKER = "AI Product Composition Root: <package-id>"
 PRODUCT_TARGET_MARKER = "AI Refactor target: package-oriented-product"
-EXPECTED_PACKAGE_VERSION = "0.5.1"
+EXPECTED_PACKAGE_VERSION = "0.5.2"
 EXPECTED_DEPENDENCIES = {
     "com.actionfit.custompackagemanager": "1.1.106",
-    "com.actionfit.referencebinding": "0.2.1",
+    "com.actionfit.referencebinding": "0.2.2",
 }
 
 
@@ -195,7 +196,7 @@ class CodeConventionSkillTests(unittest.TestCase):
             self.assertIn("resolve the required `com.actionfit.referencebinding/AI_GUIDE.md`", contents)
             self.assertIn("stop before authoring serialized-reference code", contents)
             self.assertIn("Continue normally when local convention documents are absent", contents)
-            self.assertIn("`AFCC-RFS-004`", contents)
+            self.assertIn("`AFCC-RFS-005`", contents)
             self.assertIn("`AFCC-DOC-001`", contents)
             self.assertIn("Do not issue a normal completion report", contents)
 
@@ -323,28 +324,17 @@ class CodeConventionSkillTests(unittest.TestCase):
             "using ReferenceBinding;",
             '[SerializeField, RequiredChildReference("ContentRoot")]',
             '[RequiredReference("ICON_SPRITE_MISSING")]',
-            "private void OnValidate()",
-            "#if UNITY_EDITOR",
-            "ReferenceBindingRequests.Enqueue(this);",
-            "#endif",
         ):
             self.assertIn(reference_binding_contract, template)
-        self.assertIn(
-            "#if UNITY_EDITOR\n"
-            "    private void OnValidate()\n"
-            "    {\n"
-            "        ReferenceBindingRequests.Enqueue(this);\n"
-            "    }\n"
-            "#endif",
-            template,
-        )
         self.assertEqual(1, template.count("RequiredChildReference"))
         self.assertEqual(1, template.count("RequiredReference"))
         self.assertEqual(0, template.count("AutoWireChild"))
-        self.assertEqual(1, template.count("ReferenceBindingRequests.Enqueue(this)"))
+        self.assertEqual(0, template.count("ReferenceBindingRequests.Enqueue(this)"))
         for excluded in (
             " set;",
             "ReferenceBinding.Editor",
+            "private void OnValidate()",
+            "#if UNITY_EDITOR",
             "void Start",
             "void Update",
             "Tooltip",
@@ -440,14 +430,21 @@ class CodeConventionSkillTests(unittest.TestCase):
             "### `AFCC-RFS-004`", 1
         )[0]
         self.assertIn("Deprecated", deprecated_required_refs)
-        self.assertIn("`AFCC-RFS-004`", deprecated_required_refs)
+        self.assertIn("`AFCC-RFS-005`", deprecated_required_refs)
         self.assertIn("`RequiredReference`", deprecated_required_refs)
         self.assertIn("`AutoWireChild`", deprecated_required_refs)
+        deprecated_integrated_refs = guide.split("### `AFCC-RFS-004`", 1)[1].split(
+            "### `AFCC-RFS-005`", 1
+        )[0]
+        self.assertIn("Deprecated", deprecated_integrated_refs)
+        self.assertIn("consumer", deprecated_integrated_refs)
+        self.assertIn("`OnValidate`", deprecated_integrated_refs)
         for rule_id in (
             "AFCC-RFS-001",
             "AFCC-RFS-002",
             "AFCC-RFS-003",
             "AFCC-RFS-004",
+            "AFCC-RFS-005",
             "AFCC-SER-004",
         ):
             self.assertIn(rule_id, profile)
@@ -473,7 +470,7 @@ class CodeConventionSkillTests(unittest.TestCase):
         for agent in ("Codex", "Claude"):
             apply_skill = self._read_skill(agent, "code-convention-apply")
             self.assertIn("`AFCC-RFS-002`", apply_skill)
-            self.assertIn("`AFCC-RFS-004`", apply_skill)
+            self.assertIn("`AFCC-RFS-005`", apply_skill)
             self.assertIn("`AFCC-SER-004`", apply_skill)
             self.assertIn("getter-only access", apply_skill)
             self.assertIn("separate runtime model", apply_skill)
@@ -668,7 +665,7 @@ class CodeConventionSkillTests(unittest.TestCase):
             self.assertIn(f"Packages/{package_id}/AI_GUIDE.md", routing)
         self.assertIn("Package/API Mismatch", routing)
         self.assertIn("Keep project-specific type names", routing)
-        self.assertIn("`AFCC-RFS-004`", routing)
+        self.assertIn("`AFCC-RFS-005`", routing)
         self.assertIn("`RequiredChildReference`", routing)
         self.assertIn("`RequiredReference` plus `AutoWireChild`", routing)
 

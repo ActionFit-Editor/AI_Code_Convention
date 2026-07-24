@@ -22,17 +22,6 @@ public class GeneratedConventionProbe : MonoBehaviour
 
     #endregion
 
-    #region Unity Lifecycle
-
-#if UNITY_EDITOR
-    private void OnValidate()
-    {
-        ReferenceBindingRequests.Enqueue(this);
-    }
-#endif
-
-    #endregion
-
     #region Serialized Types
 
     [Serializable]

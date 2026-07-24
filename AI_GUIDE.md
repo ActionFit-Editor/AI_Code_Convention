@@ -8,10 +8,10 @@ This file is the portable authority for generic Unity code-authoring rules distr
 - Display name: AI Code Convention
 - Repository: `https://github.com/ActionFit-Editor/AI_Code_Convention.git`
 - Repository visibility: Public
-- Current package version at generation time: `0.5.1`
+- Current package version at generation time: `0.5.2`
 - Unity version: `6000.2`
 - Custom Package Manager dependency: release candidate `1.1.106`
-- ReferenceBinding dependency: published `0.2.1`
+- ReferenceBinding dependency: release candidate `0.2.2`
 
 ## Purpose And Boundary
 
@@ -27,8 +27,8 @@ The package does not prove that existing source code complies with its guidance.
 - The template uses Unity's `#SCRIPTNAME#`, `#ROOTNAMESPACEBEGIN#`, and `#ROOTNAMESPACEEND#` tokens. Unity owns destination selection, rename interaction, class-name replacement, root-namespace expansion, and existing-file handling.
 - The generated starter contains example `Refs`, `Assets`, and `Settings` containers under `AFCC-RFS-002`, private `[SerializeField]` backing fields and getter-only access under `AFCC-SER-004`, and no empty lifecycle methods.
 - `Refs.contentRoot` uses `RequiredChildReference("ContentRoot")`. The exact GameObject name is both the authoritative child selector and the context for package-owned missing/ambiguous diagnostics; callers do not provide an error code. `Assets.iconSprite` remains `RequiredReference("ICON_SPRITE_MISSING")` because it is an external asset without a hierarchy selector; `Settings` has no reference attributes.
-- The complete `OnValidate` declaration is wrapped in `#if UNITY_EDITOR`. Editor compilation still enqueues the owning `MonoBehaviour`, never a nested container, while Player compilation emits neither the method nor the Editor-only request type.
-- `com.actionfit.referencebinding@0.2.1` is a required package dependency and owns attribute, processing, validation, default-Inspector read-only presentation, Play Mode, Dirty-state, and save behavior. Its `RequiredChildReference` selector owns an attributed field and may replace a null, broken, out-of-scope, or selector-mismatched reference when exactly one candidate exists. The attribute does not replace `[SerializeField]` for a private field. The generator never saves a Scene or Prefab and does not define a second reference-processing API.
+- The generated starter does not add `OnValidate`. The package-owned ReferenceBinding Editor pump discovers and routes loaded owners, while the public enqueue API remains available only for explicit compatibility calls.
+- `com.actionfit.referencebinding@0.2.2` is a required package dependency and owns attribute, processing, validation, default-Inspector read-only presentation, Play Mode, Dirty-state, and save behavior. Its `RequiredChildReference` selector owns an attributed field and may replace a null, broken, out-of-scope, or selector-mismatched reference when exactly one candidate exists. The attribute does not replace `[SerializeField]` for a private field. The generator never saves a Scene or Prefab and does not define a second reference-processing API.
 - The generated output compiles in Unity predefined assemblies through ReferenceBinding's auto-referenced Runtime assembly. A consuming custom asmdef must explicitly reference `com.actionfit.referencebinding`; package installation alone does not add that assembly reference, and this generator does not mutate consuming asmdefs.
 - Invoking this menu is an explicit request for the `actionfit-unity` starter shape. It does not read or write the repository's profile selector, infer a profile, create or change an asmdef, overwrite or migrate existing scripts, or enforce runtime immutability mechanically.
 - The generated file is user-owned after creation. Replace the example fields with feature-specific inputs while preserving the selected effective rules. Package updates never rewrite generated scripts, and the starter alone is not source-compliance proof.
@@ -281,11 +281,19 @@ For new or deliberately revised ActionFit serialized inputs, use nested public s
 
 ### `AFCC-RFS-003` — Deprecated: preserve the legacy paired selector contract
 
-This rule retains its original meaning for compatibility: every newly created or deliberately revised supported mandatory `Refs` Component field used `RequiredReference` and authoritative `AutoWireChild` together, with the exact case-sensitive root-or-descendant GameObject name as selector and a complete Editor-guarded owner `OnValidate` enqueue. Existing declarations remain supported and are not bulk-migrated. Do not apply this legacy pair to new or deliberately revised fields; use `AFCC-RFS-004`.
+This rule retains its original meaning for compatibility: every newly created or deliberately revised supported mandatory `Refs` Component field used `RequiredReference` and authoritative `AutoWireChild` together, with the exact case-sensitive root-or-descendant GameObject name as selector and a complete Editor-guarded owner `OnValidate` enqueue. Existing declarations remain supported and are not bulk-migrated. Do not apply this legacy pair to new or deliberately revised fields; use `AFCC-RFS-005`.
 
-### `AFCC-RFS-004` — Use the integrated required child-reference contract
+### `AFCC-RFS-004` — Deprecated: preserve the consumer-enqueued integrated child-reference contract
 
 Under `actionfit-unity`, every newly created or deliberately revised mandatory `Refs` Component field whose serialized shape is supported by the installed ReferenceBinding owner must declare `[SerializeField, RequiredChildReference("ExactGameObjectName")]`. `SerializeField` remains responsible for serializing and exposing a private field, while `RequiredChildReference` makes the default Inspector control read-only, validates the reference without a caller-defined error code, and authoritatively auto-wires the exact, case-sensitive root-or-descendant GameObject name. The owner MonoBehaviour must enqueue itself through a complete Editor-guarded `OnValidate` declaration. Do not combine the integrated attribute with `RequiredReference` or `AutoWireChild`, preserve a mismatched manual reference as another authority, or add a runtime hierarchy lookup fallback.
+
+Before authoring or changing the selector, identify the intended candidate from an existing valid serialized reference or an explicit user decision. If the same Component type and selector name produce duplicate candidates, never choose the first match. Rename only the non-selected duplicate GameObjects, only inside an explicitly authorized asset-edit scope, and use deterministic collision-free temporary names derived from the original name and stable hierarchy order. Report every old/new hierarchy path and check runtime name lookup, Animation bindings, and external tool contracts. Inspect the targeted serialized diff and verify reload without reference loss. If the intended candidate is unknown, asset-name edits are not authorized, or validation evidence is unavailable, stop and report the ambiguity instead of weakening or omitting `RequiredChildReference`. Untouched legacy fields remain progressive migration candidates rather than automatic rewrite targets.
+
+Do not apply this deprecated consumer-enqueued shape to new or deliberately revised fields; use `AFCC-RFS-005`.
+
+### `AFCC-RFS-005` — Use package-owned automatic child-reference processing
+
+Under `actionfit-unity`, every newly created or deliberately revised mandatory `Refs` Component field whose serialized shape is supported by the installed ReferenceBinding owner must declare `[SerializeField, RequiredChildReference("ExactGameObjectName")]`. `SerializeField` remains responsible for serializing and exposing a private field, while `RequiredChildReference` makes the default Inspector control read-only, validates the reference without a caller-defined error code, and authoritatively auto-wires the exact, case-sensitive root-or-descendant GameObject name. The package-owned Editor pump discovers and routes loaded owners; a consumer must not add `OnValidate` solely to enqueue ReferenceBinding work. The public `ReferenceBindingRequests.Enqueue` API remains available for explicit compatibility calls. Do not combine the integrated attribute with `RequiredReference` or `AutoWireChild`, preserve a mismatched manual reference as another authority, or add a runtime hierarchy lookup fallback.
 
 Before authoring or changing the selector, identify the intended candidate from an existing valid serialized reference or an explicit user decision. If the same Component type and selector name produce duplicate candidates, never choose the first match. Rename only the non-selected duplicate GameObjects, only inside an explicitly authorized asset-edit scope, and use deterministic collision-free temporary names derived from the original name and stable hierarchy order. Report every old/new hierarchy path and check runtime name lookup, Animation bindings, and external tool contracts. Inspect the targeted serialized diff and verify reload without reference loss. If the intended candidate is unknown, asset-name edits are not authorized, or validation evidence is unavailable, stop and report the ambiguity instead of weakening or omitting `RequiredChildReference`. Untouched legacy fields remain progressive migration candidates rather than automatic rewrite targets.
 
@@ -374,7 +382,7 @@ Report changed files, ownership/state/communication decisions, validation perfor
 
 ## Release And Distribution Boundary
 
-- This `0.5.1` candidate targets the Public `ActionFit-Editor/AI_Code_Convention` repository under the package owner's distribution authorization.
+- This `0.5.2` candidate targets the Public `ActionFit-Editor/AI_Code_Convention` repository under the package owner's distribution authorization.
 - Public visibility does not permit credentials, tokens, private keys, or machine-specific configuration in the package and does not grant rights beyond explicit repository license terms.
 - Publishing is manual through Custom Package Manager. Do not create a repository, push, tag, append a catalog row, deploy, or install into global/home skill directories without separate authorization.
 - Before any later release, re-check remote tags and align `package.json`, README, this guide, PackageInfo, and release notes.
